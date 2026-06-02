@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>文章与标签的多对多关系设计 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="文章与标签的多对多关系设计引言在博客系统中，文章和标签通常是多对多的关系。本文将介绍如何使用 GORM 实现文章与标签的多对多关系。 知识点概览1. 多对多关系一个文章可以有多个标签，一个标签可以属于多个文章。 2. GORM 多对多配置使用 many2many 标签配置多对多关系。 3. 关联查询查询文章时加载关联的标签，查询标签时加载关联的文章。 代码示例模型定义： 1234567891011">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文章与标签的多对多关系设计">
+<meta property="og:url" content="http://localhost:4000/2026/06/02/ginArticleTag/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="文章与标签的多对多关系设计引言在博客系统中，文章和标签通常是多对多的关系。本文将介绍如何使用 GORM 实现文章与标签的多对多关系。 知识点概览1. 多对多关系一个文章可以有多个标签，一个标签可以属于多个文章。 2. GORM 多对多配置使用 many2many 标签配置多对多关系。 3. 关联查询查询文章时加载关联的标签，查询标签时加载关联的文章。 代码示例模型定义： 1234567891011">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-02T07:43:37.000Z">
+<meta property="article:modified_time" content="2026-06-02T08:58:50.580Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Gin">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Web">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/categories">分类</a>
+        
+          <a class="main-nav-link" href="/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://localhost:4000"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-ginArticleTag" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/06/02/ginArticleTag/" class="article-date">
+  <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      文章与标签的多对多关系设计
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="文章与标签的多对多关系设计"><a href="#文章与标签的多对多关系设计" class="headerlink" title="文章与标签的多对多关系设计"></a>文章与标签的多对多关系设计</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>在博客系统中，文章和标签通常是多对多的关系。本文将介绍如何使用 GORM 实现文章与标签的多对多关系。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-多对多关系"><a href="#1-多对多关系" class="headerlink" title="1. 多对多关系"></a>1. 多对多关系</h4><p>一个文章可以有多个标签，一个标签可以属于多个文章。</p>
+<h4 id="2-GORM-多对多配置"><a href="#2-GORM-多对多配置" class="headerlink" title="2. GORM 多对多配置"></a>2. GORM 多对多配置</h4><p>使用 <code>many2many</code> 标签配置多对多关系。</p>
+<h4 id="3-关联查询"><a href="#3-关联查询" class="headerlink" title="3. 关联查询"></a>3. 关联查询</h4><p>查询文章时加载关联的标签，查询标签时加载关联的文章。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>模型定义</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> model</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;gorm.io/gorm&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Article <span class="keyword">struct</span> &#123;</span><br><span class="line">    gorm.Model</span><br><span class="line">    Title   <span class="type">string</span> <span class="string">`json:&quot;title&quot;`</span></span><br><span class="line">    Content <span class="type">string</span> <span class="string">`json:&quot;content&quot;`</span></span><br><span class="line">    Tags    []Tag  <span class="string">`gorm:&quot;many2many:article_tags;&quot; json:&quot;tags&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Tag <span class="keyword">struct</span> &#123;</span><br><span class="line">    gorm.Model</span><br><span class="line">    Name     <span class="type">string</span>    <span class="string">`json:&quot;name&quot;`</span></span><br><span class="line">    Articles []Article <span class="string">`gorm:&quot;many2many:article_tags;&quot; json:&quot;articles&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>创建文章并关联标签</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> CreateArticleWithTags(title, content <span class="type">string</span>, tagNames []<span class="type">string</span>) (*Article, <span class="type">error</span>) &#123;</span><br><span class="line">    article := Article&#123;</span><br><span class="line">        Title:   title,</span><br><span class="line">        Content: content,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建或获取标签</span></span><br><span class="line">    <span class="keyword">var</span> tags []Tag</span><br><span class="line">    <span class="keyword">for</span> _, name := <span class="keyword">range</span> tagNames &#123;</span><br><span class="line">        <span class="keyword">var</span> tag Tag</span><br><span class="line">        <span class="keyword">if</span> err := s.db.Where(<span class="string">&quot;name = ?&quot;</span>, name).FirstOrCreate(&amp;tag, Tag&#123;Name: name&#125;).Error; err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">        &#125;</span><br><span class="line">        tags = <span class="built_in">append</span>(tags, tag)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 关联标签</span></span><br><span class="line">    <span class="keyword">if</span> err := s.db.Create(&amp;article).Error; err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := s.db.Model(&amp;article).Association(<span class="string">&quot;Tags&quot;</span>).Append(tags); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> &amp;article, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>查询文章及其标签</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> GetArticleWithTags(id <span class="type">uint</span>) (*Article, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> article Article</span><br><span class="line">    err := s.db.Preload(<span class="string">&quot;Tags&quot;</span>).First(&amp;article, id).Error</span><br><span class="line">    <span class="keyword">return</span> &amp;article, err</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> ListArticlesWithTags(page, pageSize <span class="type">int</span>) ([]*Article, <span class="type">int64</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> articles []*Article</span><br><span class="line">    <span class="keyword">var</span> total <span class="type">int64</span></span><br><span class="line">    </span><br><span class="line">    err := s.db.Model(&amp;Article&#123;&#125;).Count(&amp;total).Error</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, <span class="number">0</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    err = s.db.</span><br><span class="line">        Preload(<span class="string">&quot;Tags&quot;</span>).</span><br><span class="line">        Order(<span class="string">&quot;created_at DESC&quot;</span>).</span><br><span class="line">        Limit(pageSize).</span><br><span class="line">        Offset((page - <span class="number">1</span>) * pageSize).</span><br><span class="line">        Find(&amp;articles).Error</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> articles, total, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>查询标签及其文章</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *TagService)</span></span> GetTagWithArticles(id <span class="type">uint</span>) (*Tag, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> tag Tag</span><br><span class="line">    err := s.db.Preload(<span class="string">&quot;Articles&quot;</span>).First(&amp;tag, id).Error</span><br><span class="line">    <span class="keyword">return</span> &amp;tag, err</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *TagService)</span></span> ListTagsWithArticles() ([]*Tag, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> tags []Tag</span><br><span class="line">    err := s.db.Preload(<span class="string">&quot;Articles&quot;</span>).Find(&amp;tags).Error</span><br><span class="line">    <span class="keyword">return</span> tags, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>根据标签筛选文章</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> ListArticlesByTag(tagName <span class="type">string</span>, page, pageSize <span class="type">int</span>) ([]*Article, <span class="type">int64</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> articles []*Article</span><br><span class="line">    <span class="keyword">var</span> total <span class="type">int64</span></span><br><span class="line">    </span><br><span class="line">    subquery := s.db.Model(&amp;Tag&#123;&#125;).Select(<span class="string">&quot;id&quot;</span>).Where(<span class="string">&quot;name = ?&quot;</span>, tagName)</span><br><span class="line">    </span><br><span class="line">    err := s.db.</span><br><span class="line">        Joins(<span class="string">&quot;JOIN article_tags ON articles.id = article_tags.article_id&quot;</span>).</span><br><span class="line">        Where(<span class="string">&quot;article_tags.tag_id IN (?)&quot;</span>, subquery).</span><br><span class="line">        Count(&amp;total).Error</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, <span class="number">0</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    err = s.db.</span><br><span class="line">        Preload(<span class="string">&quot;Tags&quot;</span>).</span><br><span class="line">        Joins(<span class="string">&quot;JOIN article_tags ON articles.id = article_tags.article_id&quot;</span>).</span><br><span class="line">        Where(<span class="string">&quot;article_tags.tag_id IN (?)&quot;</span>, subquery).</span><br><span class="line">        Order(<span class="string">&quot;created_at DESC&quot;</span>).</span><br><span class="line">        Limit(pageSize).</span><br><span class="line">        Offset((page - <span class="number">1</span>) * pageSize).</span><br><span class="line">        Find(&amp;articles).Error</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> articles, total, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>移除文章的标签</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> RemoveTagFromArticle(articleID, tagID <span class="type">uint</span>) <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> article Article</span><br><span class="line">    <span class="keyword">if</span> err := s.db.First(&amp;article, articleID).Error; err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> tag Tag</span><br><span class="line">    <span class="keyword">if</span> err := s.db.First(&amp;tag, tagID).Error; err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> s.db.Model(&amp;article).Association(<span class="string">&quot;Tags&quot;</span>).Delete(&amp;tag)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试命令</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建带标签的文章</span></span><br><span class="line">curl -X POST -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">    -d <span class="string">&#x27;&#123;&quot;title&quot;:&quot;Go 入门&quot;,&quot;content&quot;:&quot;学习 Go 语言&quot;,&quot;tags&quot;:[&quot;Go&quot;,&quot;Backend&quot;]&#125;&#x27;</span> \</span><br><span class="line">    http://localhost:8080/api/v1/articles</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询文章及标签</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles/1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据标签查询文章</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles?tag=Go</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询标签及文章</span></span><br><span class="line">curl http://localhost:8080/api/v1/tags/1</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">erDiagram</span><br><span class="line">    ARTICLE ||--o&#123; ARTICLE_TAGS : &quot;has&quot;</span><br><span class="line">    TAG ||--o&#123; ARTICLE_TAGS : &quot;has&quot;</span><br><span class="line">    </span><br><span class="line">    ARTICLE &#123;</span><br><span class="line">        uint id PK</span><br><span class="line">        string title</span><br><span class="line">        string content</span><br><span class="line">        datetime created_at</span><br><span class="line">        datetime updated_at</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    TAG &#123;</span><br><span class="line">        uint id PK</span><br><span class="line">        string name</span><br><span class="line">        datetime created_at</span><br><span class="line">        datetime updated_at</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ARTICLE_TAGS &#123;</span><br><span class="line">        uint article_id FK</span><br><span class="line">        uint tag_id FK</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了如何实现文章与标签的多对多关系：</p>
+<ul>
+<li>使用 GORM 的 <code>many2many</code> 标签配置多对多关系</li>
+<li>创建文章时关联标签</li>
+<li>查询时预加载关联数据</li>
+<li>根据标签筛选文章</li>
+</ul>
+<p>多对多关系是博客系统中常见的需求，合理设计可以提高数据的组织和查询效率。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://localhost:4000/2026/06/02/ginArticleTag/" data-id="cuidTm_HgwVNOtEnj-nTOsSGW" data-title="文章与标签的多对多关系设计" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2026/06/02/ginCache/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          Redis 缓存策略与实现
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2026/06/02/ginArticleSearch/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">文章列表分页与搜索功能实现</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/tags/Go/" style="font-size: 10px;">Go</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCache/">Redis 缓存策略与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginDockerNginx/">Docker 与 Nginx 部署实战</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

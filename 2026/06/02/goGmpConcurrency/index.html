@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Go 并发模型 GMP：为高并发做准备 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Go 并发模型 GMP：为高并发做准备引言Go 语言以其出色的并发支持而闻名，这得益于其独特的 GMP 并发模型。理解 GMP 模型对于编写高效的并发程序至关重要。本文将深入解析 GMP 模型的原理和工作机制。 知识点概览1. GMP 模型概述GMP 是 Go 语言运行时的并发调度模型：  G（Goroutine）：轻量级线程，由 Go 运行时管理 M（Machine）：操作系统线程 P（Proc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 并发模型 GMP：为高并发做准备">
+<meta property="og:url" content="http://localhost:4000/2026/06/02/goGmpConcurrency/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="Go 并发模型 GMP：为高并发做准备引言Go 语言以其出色的并发支持而闻名，这得益于其独特的 GMP 并发模型。理解 GMP 模型对于编写高效的并发程序至关重要。本文将深入解析 GMP 模型的原理和工作机制。 知识点概览1. GMP 模型概述GMP 是 Go 语言运行时的并发调度模型：  G（Goroutine）：轻量级线程，由 Go 运行时管理 M（Machine）：操作系统线程 P（Proc">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-02T07:43:37.000Z">
+<meta property="article:modified_time" content="2026-06-02T08:53:20.654Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Gin">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Web">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/categories">分类</a>
+        
+          <a class="main-nav-link" href="/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://localhost:4000"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-goGmpConcurrency" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/06/02/goGmpConcurrency/" class="article-date">
+  <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Go 并发模型 GMP：为高并发做准备
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="Go-并发模型-GMP：为高并发做准备"><a href="#Go-并发模型-GMP：为高并发做准备" class="headerlink" title="Go 并发模型 GMP：为高并发做准备"></a>Go 并发模型 GMP：为高并发做准备</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>Go 语言以其出色的并发支持而闻名，这得益于其独特的 GMP 并发模型。理解 GMP 模型对于编写高效的并发程序至关重要。本文将深入解析 GMP 模型的原理和工作机制。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-GMP-模型概述"><a href="#1-GMP-模型概述" class="headerlink" title="1. GMP 模型概述"></a>1. GMP 模型概述</h4><p>GMP 是 Go 语言运行时的并发调度模型：</p>
+<ul>
+<li><strong>G（Goroutine）</strong>：轻量级线程，由 Go 运行时管理</li>
+<li><strong>M（Machine）</strong>：操作系统线程</li>
+<li><strong>P（Processor）</strong>：处理器，负责调度 Goroutine</li>
+</ul>
+<h4 id="2-Goroutine"><a href="#2-Goroutine" class="headerlink" title="2. Goroutine"></a>2. Goroutine</h4><p>Goroutine 是 Go 语言中的轻量级执行单元，相比操作系统线程，Goroutine 更加轻量：</p>
+<ul>
+<li>初始栈大小约 2KB</li>
+<li>可以动态扩展收缩大小</li>
+<li>创建和切换开销低</li>
+</ul>
+<h4 id="3-M-和-P-的关系"><a href="#3-M-和-P-的关系" class="headerlink" title="3. M 和 P 的关系"></a>3. M 和 P 的关系</h4><ul>
+<li>M 是真正执行代码的操作系统线程</li>
+<li>P 是处理器，包含运行 Goroutine 所需的上下文</li>
+<li>M 必须绑定一个 P 才能执行 Goroutine</li>
+</ul>
+<h4 id="4-GOMAXPROCS"><a href="#4-GOMAXPROCS" class="headerlink" title="4. GOMAXPROCS"></a>4. GOMAXPROCS</h4><p><code>runtime.GOMAXPROCS(n)</code> 设置同时执行 Goroutine 的最大 CPU 核心数。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;runtime&quot;</span></span><br><span class="line">    <span class="string">&quot;sync&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前 GOMAXPROCS 值</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Current GOMAXPROCS:&quot;</span>, runtime.GOMAXPROCS(<span class="number">0</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置使用 4 个 CPU 核心</span></span><br><span class="line">    runtime.GOMAXPROCS(<span class="number">4</span>)</span><br><span class="line">    fmt.Println(<span class="string">&quot;Updated GOMAXPROCS:&quot;</span>, runtime.GOMAXPROCS(<span class="number">0</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 演示大量 Goroutine 调度</span></span><br><span class="line">    <span class="keyword">const</span> numGoroutines = <span class="number">10000</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">    wg.Add(numGoroutines)</span><br><span class="line">    </span><br><span class="line">    start := time.Now()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; numGoroutines; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(id <span class="type">int</span>)</span></span> &#123;</span><br><span class="line">            <span class="keyword">defer</span> wg.Done()</span><br><span class="line">            <span class="comment">// 模拟计算任务</span></span><br><span class="line">            sum := <span class="number">0</span></span><br><span class="line">            <span class="keyword">for</span> j := <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++ &#123;</span><br><span class="line">                sum += j</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 每 1000 个 Goroutine 打印一次</span></span><br><span class="line">            <span class="keyword">if</span> id%<span class="number">1000</span> == <span class="number">0</span> &#123;</span><br><span class="line">                fmt.Printf(<span class="string">&quot;Goroutine %d completed, sum=%d\n&quot;</span>, id, sum)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;(i)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    wg.Wait()</span><br><span class="line">    </span><br><span class="line">    elapsed := time.Since(start)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Completed %d goroutines in %v\n&quot;</span>, numGoroutines, elapsed)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 查看当前 Goroutine 数量</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Current goroutines:&quot;</span>, runtime.NumGoroutine())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">go run main.go</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 -race 检测数据竞争</span></span><br><span class="line">go run -race main.go</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    subgraph OS</span><br><span class="line">        M1[M1 - OS Thread]</span><br><span class="line">        M2[M2 - OS Thread]</span><br><span class="line">        M3[M3 - OS Thread]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    subgraph Go Runtime</span><br><span class="line">        P1[P1 - Processor]</span><br><span class="line">        P2[P2 - Processor]</span><br><span class="line">        P3[P3 - Processor]</span><br><span class="line">        P4[P4 - Processor]</span><br><span class="line">        </span><br><span class="line">        G1[G1 - Goroutine]</span><br><span class="line">        G2[G2 - Goroutine]</span><br><span class="line">        G3[G3 - Goroutine]</span><br><span class="line">        G4[G4 - Goroutine]</span><br><span class="line">        G5[G5 - Goroutine]</span><br><span class="line">        G6[G6 - Goroutine]</span><br><span class="line">        </span><br><span class="line">        LocalQueue1[(Local Queue)]</span><br><span class="line">        LocalQueue2[(Local Queue)]</span><br><span class="line">        LocalQueue3[(Local Queue)]</span><br><span class="line">        LocalQueue4[(Local Queue)]</span><br><span class="line">        </span><br><span class="line">        GlobalQueue[(Global Queue)]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    M1 --&gt; P1</span><br><span class="line">    M2 --&gt; P2</span><br><span class="line">    M3 --&gt; P3</span><br><span class="line">    </span><br><span class="line">    P1 --&gt; G1</span><br><span class="line">    P1 --&gt; LocalQueue1</span><br><span class="line">    P2 --&gt; G2</span><br><span class="line">    P2 --&gt; LocalQueue2</span><br><span class="line">    P3 --&gt; G3</span><br><span class="line">    P3 --&gt; LocalQueue3</span><br><span class="line">    P4 --&gt; LocalQueue4</span><br><span class="line">    </span><br><span class="line">    GlobalQueue --&gt; G4</span><br><span class="line">    GlobalQueue --&gt; G5</span><br><span class="line">    GlobalQueue --&gt; G6</span><br><span class="line">    </span><br><span class="line">    P1 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P2 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P3 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P4 -.窃取.-&gt; GlobalQueue</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了 Go 的 GMP 并发模型：</p>
+<ul>
+<li>G（Goroutine）：轻量级执行单元</li>
+<li>M（Machine）：操作系统线程</li>
+<li>P（Processor）：处理器，管理 Goroutine</li>
+<li>使用 <code>runtime.GOMAXPROCS()</code> 设置并发度</li>
+</ul>
+<p>理解 GMP 模型对于编写高效的并发程序至关重要。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://localhost:4000/2026/06/02/goGmpConcurrency/" data-id="cuidaw6tzSZld7q77BoI3Gs8M" data-title="Go 并发模型 GMP：为高并发做准备" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2026/06/02/goConcurrencyBugs/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          常见并发 Bug 与预防
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/tags/Go/" style="font-size: 10px;">Go</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCache/">Redis 缓存策略与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginDockerNginx/">Docker 与 Nginx 部署实战</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

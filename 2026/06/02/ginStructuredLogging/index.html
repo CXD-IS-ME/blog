@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>结构化日志与监控 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="结构化日志与监控引言在生产环境中，结构化日志和监控是排查问题和保障系统稳定的关键。本文将介绍如何在 Gin 项目中实现结构化日志和基础监控。 知识点概览1. 结构化日志使用 JSON 格式输出日志，便于日志分析工具解析。 2. 日志级别区分 Debug、Info、Warn、Error、Fatal 等不同级别的日志。 3. 请求追踪为每个请求分配唯一 ID，便于追踪请求链路。 4. 基础监控记录请求">
+<meta property="og:type" content="article">
+<meta property="og:title" content="结构化日志与监控">
+<meta property="og:url" content="http://localhost:4000/2026/06/02/ginStructuredLogging/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="结构化日志与监控引言在生产环境中，结构化日志和监控是排查问题和保障系统稳定的关键。本文将介绍如何在 Gin 项目中实现结构化日志和基础监控。 知识点概览1. 结构化日志使用 JSON 格式输出日志，便于日志分析工具解析。 2. 日志级别区分 Debug、Info、Warn、Error、Fatal 等不同级别的日志。 3. 请求追踪为每个请求分配唯一 ID，便于追踪请求链路。 4. 基础监控记录请求">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-02T07:43:37.000Z">
+<meta property="article:modified_time" content="2026-06-02T09:01:18.224Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Gin">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Web">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/categories">分类</a>
+        
+          <a class="main-nav-link" href="/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://localhost:4000"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-ginStructuredLogging" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/06/02/ginStructuredLogging/" class="article-date">
+  <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      结构化日志与监控
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="结构化日志与监控"><a href="#结构化日志与监控" class="headerlink" title="结构化日志与监控"></a>结构化日志与监控</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>在生产环境中，结构化日志和监控是排查问题和保障系统稳定的关键。本文将介绍如何在 Gin 项目中实现结构化日志和基础监控。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-结构化日志"><a href="#1-结构化日志" class="headerlink" title="1. 结构化日志"></a>1. 结构化日志</h4><p>使用 JSON 格式输出日志，便于日志分析工具解析。</p>
+<h4 id="2-日志级别"><a href="#2-日志级别" class="headerlink" title="2. 日志级别"></a>2. 日志级别</h4><p>区分 Debug、Info、Warn、Error、Fatal 等不同级别的日志。</p>
+<h4 id="3-请求追踪"><a href="#3-请求追踪" class="headerlink" title="3. 请求追踪"></a>3. 请求追踪</h4><p>为每个请求分配唯一 ID，便于追踪请求链路。</p>
+<h4 id="4-基础监控"><a href="#4-基础监控" class="headerlink" title="4. 基础监控"></a>4. 基础监控</h4><p>记录请求耗时、响应状态码等指标。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>使用 zap 实现结构化日志</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> logger</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">    <span class="string">&quot;go.uber.org/zap&quot;</span></span><br><span class="line">    <span class="string">&quot;go.uber.org/zap/zapcore&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> logger *zap.Logger</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">InitLogger</span><span class="params">()</span></span> &#123;</span><br><span class="line">    config := zap.NewProductionConfig()</span><br><span class="line">    config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder</span><br><span class="line">    <span class="keyword">var</span> err <span class="type">error</span></span><br><span class="line">    logger, err = config.Build()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetLogger</span><span class="params">()</span></span> *zap.Logger &#123;</span><br><span class="line">    <span class="keyword">return</span> logger</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GinLogger</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        start := time.Now()</span><br><span class="line">        path := c.Request.URL.Path</span><br><span class="line">        query := c.Request.URL.RawQuery</span><br><span class="line">        </span><br><span class="line">        c.Next()</span><br><span class="line">        </span><br><span class="line">        latency := time.Since(start)</span><br><span class="line">        status := c.Writer.Status()</span><br><span class="line">        method := c.Request.Method</span><br><span class="line">        clientIP := c.ClientIP()</span><br><span class="line">        requestID := c.GetString(<span class="string">&quot;request_id&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        logger.Info(<span class="string">&quot;request&quot;</span>,</span><br><span class="line">            zap.String(<span class="string">&quot;request_id&quot;</span>, requestID),</span><br><span class="line">            zap.String(<span class="string">&quot;method&quot;</span>, method),</span><br><span class="line">            zap.String(<span class="string">&quot;path&quot;</span>, path),</span><br><span class="line">            zap.String(<span class="string">&quot;query&quot;</span>, query),</span><br><span class="line">            zap.Int(<span class="string">&quot;status&quot;</span>, status),</span><br><span class="line">            zap.Duration(<span class="string">&quot;latency&quot;</span>, latency),</span><br><span class="line">            zap.String(<span class="string">&quot;client_ip&quot;</span>, clientIP),</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>请求 ID 中间件</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RequestIDMiddleware</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        requestID := uuid.New().String()</span><br><span class="line">        c.Set(<span class="string">&quot;request_id&quot;</span>, requestID)</span><br><span class="line">        c.Header(<span class="string">&quot;X-Request-ID&quot;</span>, requestID)</span><br><span class="line">        c.Next()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>记录错误日志</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ErrorHandler</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.Next()</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(c.Errors) &gt; <span class="number">0</span> &#123;</span><br><span class="line">            err := c.Errors.Last()</span><br><span class="line">            requestID := c.GetString(<span class="string">&quot;request_id&quot;</span>)</span><br><span class="line">            </span><br><span class="line">            logger.Error(<span class="string">&quot;request error&quot;</span>,</span><br><span class="line">                zap.String(<span class="string">&quot;request_id&quot;</span>, requestID),</span><br><span class="line">                zap.String(<span class="string">&quot;path&quot;</span>, c.Request.URL.Path),</span><br><span class="line">                zap.String(<span class="string">&quot;error&quot;</span>, err.Error()),</span><br><span class="line">            )</span><br><span class="line">            </span><br><span class="line">            c.JSON(http.StatusInternalServerError, gin.H&#123;</span><br><span class="line">                <span class="string">&quot;error&quot;</span>:       <span class="string">&quot;internal server error&quot;</span>,</span><br><span class="line">                <span class="string">&quot;request_id&quot;</span>: requestID,</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>性能监控中间件</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Metrics <span class="keyword">struct</span> &#123;</span><br><span class="line">    requestCount     <span class="type">int64</span></span><br><span class="line">    totalLatency     time.Duration</span><br><span class="line">    statusCodeCounts <span class="keyword">map</span>[<span class="type">int</span>]<span class="type">int64</span></span><br><span class="line">    mu               sync.Mutex</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> metrics = &amp;Metrics&#123;</span><br><span class="line">    statusCodeCounts: <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="type">int</span>]<span class="type">int64</span>),</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MetricsMiddleware</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        start := time.Now()</span><br><span class="line">        </span><br><span class="line">        c.Next()</span><br><span class="line">        </span><br><span class="line">        latency := time.Since(start)</span><br><span class="line">        status := c.Writer.Status()</span><br><span class="line">        </span><br><span class="line">        metrics.mu.Lock()</span><br><span class="line">        metrics.requestCount++</span><br><span class="line">        metrics.totalLatency += latency</span><br><span class="line">        metrics.statusCodeCounts[status]++</span><br><span class="line">        metrics.mu.Unlock()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetMetrics</span><span class="params">()</span></span> <span class="keyword">map</span>[<span class="type">string</span>]<span class="keyword">interface</span>&#123;&#125; &#123;</span><br><span class="line">    metrics.mu.Lock()</span><br><span class="line">    <span class="keyword">defer</span> metrics.mu.Unlock()</span><br><span class="line">    </span><br><span class="line">    avgLatency := time.Duration(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">if</span> metrics.requestCount &gt; <span class="number">0</span> &#123;</span><br><span class="line">        avgLatency = metrics.totalLatency / time.Duration(metrics.requestCount)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">map</span>[<span class="type">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;</span><br><span class="line">        <span class="string">&quot;request_count&quot;</span>:      metrics.requestCount,</span><br><span class="line">        <span class="string">&quot;total_latency&quot;</span>:      metrics.totalLatency.String(),</span><br><span class="line">        <span class="string">&quot;average_latency&quot;</span>:    avgLatency.String(),</span><br><span class="line">        <span class="string">&quot;status_code_counts&quot;</span>: metrics.statusCodeCounts,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>暴露监控端点</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    logger.InitLogger()</span><br><span class="line">    <span class="keyword">defer</span> logger.GetLogger().Sync()</span><br><span class="line">    </span><br><span class="line">    r := gin.New()</span><br><span class="line">    </span><br><span class="line">    r.Use(RequestIDMiddleware())</span><br><span class="line">    r.Use(logger.GinLogger())</span><br><span class="line">    r.Use(MetricsMiddleware())</span><br><span class="line">    r.Use(ErrorHandler())</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 监控端点</span></span><br><span class="line">    r.GET(<span class="string">&quot;/metrics&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.JSON(http.StatusOK, GetMetrics())</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.GET(<span class="string">&quot;/articles&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.JSON(http.StatusOK, gin.H&#123;<span class="string">&quot;message&quot;</span>: <span class="string">&quot;articles&quot;</span>&#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.Run(<span class="string">&quot;:8080&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>日志输出示例</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;info&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ts&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2024-01-01T12:00:00Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;msg&quot;</span><span class="punctuation">:</span> <span class="string">&quot;request&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;request_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;GET&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/articles&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="string">&quot;page=1&amp;pageSize=10&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;status&quot;</span><span class="punctuation">:</span> <span class="number">200</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;latency&quot;</span><span class="punctuation">:</span> <span class="string">&quot;12.345ms&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;client_ip&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.1&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>测试监控端点</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:8080/metrics</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[请求] --&gt; B[RequestID]</span><br><span class="line">    B --&gt; C[GinLogger]</span><br><span class="line">    C --&gt; D[Handler]</span><br><span class="line">    D --&gt; E[Metrics]</span><br><span class="line">    E --&gt; F[返回响应]</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了结构化日志和监控的实现：</p>
+<ul>
+<li>使用 zap 实现结构化日志</li>
+<li>请求 ID 追踪</li>
+<li>性能指标收集</li>
+<li>暴露监控端点</li>
+</ul>
+<p>良好的日志和监控系统可以帮助快速定位问题，保障系统稳定运行。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://localhost:4000/2026/06/02/ginStructuredLogging/" data-id="cuidg_PNXh8k-yQZgHriPLgpO" data-title="结构化日志与监控" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2026/06/02/ginFileUpload/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          文件上传与静态资源服务
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2026/06/02/ginMiddleware/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">中间件开发与最佳实践</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/tags/Go/" style="font-size: 10px;">Go</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCache/">Redis 缓存策略与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginDockerNginx/">Docker 与 Nginx 部署实战</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

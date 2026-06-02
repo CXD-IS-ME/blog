@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>HTML 模板渲染与数据绑定 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="HTML 模板渲染与数据绑定引言虽然 Gin 常用于构建 RESTful API，但它也支持传统的 HTML 模板渲染。本文将介绍如何使用 Gin 进行模板渲染和数据绑定。 知识点概览1. 模板引擎配置配置模板目录和模板文件扩展名。 2. 数据绑定将 Go 数据结构传递给模板进行渲染。 3. 模板继承使用模板继承减少代码重复。 4. 自定义模板函数注册自定义函数扩展模板功能。 代码示例配置模板引擎">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTML 模板渲染与数据绑定">
+<meta property="og:url" content="http://localhost:4000/2026/06/02/ginTemplateRendering/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="HTML 模板渲染与数据绑定引言虽然 Gin 常用于构建 RESTful API，但它也支持传统的 HTML 模板渲染。本文将介绍如何使用 Gin 进行模板渲染和数据绑定。 知识点概览1. 模板引擎配置配置模板目录和模板文件扩展名。 2. 数据绑定将 Go 数据结构传递给模板进行渲染。 3. 模板继承使用模板继承减少代码重复。 4. 自定义模板函数注册自定义函数扩展模板功能。 代码示例配置模板引擎">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-02T07:43:37.000Z">
+<meta property="article:modified_time" content="2026-06-02T09:00:48.524Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Gin">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Web">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/categories">分类</a>
+        
+          <a class="main-nav-link" href="/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://localhost:4000"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-ginTemplateRendering" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/06/02/ginTemplateRendering/" class="article-date">
+  <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      HTML 模板渲染与数据绑定
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="HTML-模板渲染与数据绑定"><a href="#HTML-模板渲染与数据绑定" class="headerlink" title="HTML 模板渲染与数据绑定"></a>HTML 模板渲染与数据绑定</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>虽然 Gin 常用于构建 RESTful API，但它也支持传统的 HTML 模板渲染。本文将介绍如何使用 Gin 进行模板渲染和数据绑定。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-模板引擎配置"><a href="#1-模板引擎配置" class="headerlink" title="1. 模板引擎配置"></a>1. 模板引擎配置</h4><p>配置模板目录和模板文件扩展名。</p>
+<h4 id="2-数据绑定"><a href="#2-数据绑定" class="headerlink" title="2. 数据绑定"></a>2. 数据绑定</h4><p>将 Go 数据结构传递给模板进行渲染。</p>
+<h4 id="3-模板继承"><a href="#3-模板继承" class="headerlink" title="3. 模板继承"></a>3. 模板继承</h4><p>使用模板继承减少代码重复。</p>
+<h4 id="4-自定义模板函数"><a href="#4-自定义模板函数" class="headerlink" title="4. 自定义模板函数"></a>4. 自定义模板函数</h4><p>注册自定义函数扩展模板功能。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>配置模板引擎</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    r := gin.Default()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 配置模板目录</span></span><br><span class="line">    r.LoadHTMLGlob(<span class="string">&quot;templates/**/*&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 或者指定特定文件</span></span><br><span class="line">    <span class="comment">// r.LoadHTMLFiles(&quot;templates/index.html&quot;, &quot;templates/about.html&quot;)</span></span><br><span class="line">    </span><br><span class="line">    r.GET(<span class="string">&quot;/&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.HTML(http.StatusOK, <span class="string">&quot;index.html&quot;</span>, gin.H&#123;</span><br><span class="line">            <span class="string">&quot;title&quot;</span>: <span class="string">&quot;首页&quot;</span>,</span><br><span class="line">            <span class="string">&quot;user&quot;</span>: gin.H&#123;</span><br><span class="line">                <span class="string">&quot;name&quot;</span>: <span class="string">&quot;John&quot;</span>,</span><br><span class="line">                <span class="string">&quot;age&quot;</span>:  <span class="number">30</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.Run(<span class="string">&quot;:8080&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>模板文件结构</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">templates/</span><br><span class="line">├── layouts/</span><br><span class="line">│   └── base.html</span><br><span class="line">├── index.html</span><br><span class="line">└── about.html</span><br></pre></td></tr></table></figure>
+
+<p><strong>base.html</strong>（基础模板）：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>&#123;&#123;.title&#125;&#125; - My Blog<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;/static/css/style.css&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">header</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/&quot;</span>&gt;</span>My Blog<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">nav</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/&quot;</span>&gt;</span>首页<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/about&quot;</span>&gt;</span>关于<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">nav</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">header</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">main</span>&gt;</span></span><br><span class="line">        &#123;&#123;template &quot;content&quot; .&#125;&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">main</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">footer</span>&gt;</span></span><br><span class="line">        © 2024 My Blog</span><br><span class="line">    <span class="tag">&lt;/<span class="name">footer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>index.html</strong>（首页模板）：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;define &quot;content&quot;&#125;&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>&#123;&#123;.title&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>欢迎来到我的博客！<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">h3</span>&gt;</span>用户信息<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">li</span>&gt;</span>姓名：&#123;&#123;.user.name&#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">li</span>&gt;</span>年龄：&#123;&#123;.user.age&#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">h3</span>&gt;</span>文章列表<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">    &#123;&#123;range .articles&#125;&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">article</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">h4</span>&gt;</span>&#123;&#123;.Title&#125;&#125;<span class="tag">&lt;/<span class="name">h4</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123;.Content&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">article</span>&gt;</span></span><br><span class="line">    &#123;&#123;else&#125;&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>暂无文章<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    &#123;&#123;end&#125;&#125;</span><br><span class="line">&#123;&#123;end&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据绑定示例</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Article <span class="keyword">struct</span> &#123;</span><br><span class="line">    Title   <span class="type">string</span></span><br><span class="line">    Content <span class="type">string</span></span><br><span class="line">    Author  <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    r := gin.Default()</span><br><span class="line">    r.LoadHTMLGlob(<span class="string">&quot;templates/**/*&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    r.GET(<span class="string">&quot;/&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        articles := []Article&#123;</span><br><span class="line">            &#123;Title: <span class="string">&quot;Go 入门&quot;</span>, Content: <span class="string">&quot;学习 Go 语言基础&quot;</span>, Author: <span class="string">&quot;John&quot;</span>&#125;,</span><br><span class="line">            &#123;Title: <span class="string">&quot;Gin 框架&quot;</span>, Content: <span class="string">&quot;使用 Gin 构建 Web 应用&quot;</span>, Author: <span class="string">&quot;Jane&quot;</span>&#125;,</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        c.HTML(http.StatusOK, <span class="string">&quot;index.html&quot;</span>, gin.H&#123;</span><br><span class="line">            <span class="string">&quot;title&quot;</span>:    <span class="string">&quot;首页&quot;</span>,</span><br><span class="line">            <span class="string">&quot;user&quot;</span>: gin.H&#123;</span><br><span class="line">                <span class="string">&quot;name&quot;</span>: <span class="string">&quot;John&quot;</span>,</span><br><span class="line">                <span class="string">&quot;age&quot;</span>:  <span class="number">30</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;articles&quot;</span>: articles,</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.Run(<span class="string">&quot;:8080&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注册自定义模板函数</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    r := gin.Default()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建模板引擎</span></span><br><span class="line">    engine := gin.DefaultWriter</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 注册自定义函数</span></span><br><span class="line">    r.SetFuncMap(template.FuncMap&#123;</span><br><span class="line">        <span class="string">&quot;upper&quot;</span>: strings.ToUpper,</span><br><span class="line">        <span class="string">&quot;dateFormat&quot;</span>: <span class="function"><span class="keyword">func</span><span class="params">(t time.Time)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> t.Format(<span class="string">&quot;2006-01-02 15:04:05&quot;</span>)</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;truncate&quot;</span>: <span class="function"><span class="keyword">func</span><span class="params">(s <span class="type">string</span>, length <span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(s) &lt;= length &#123;</span><br><span class="line">                <span class="keyword">return</span> s</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> s[:length] + <span class="string">&quot;...&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.LoadHTMLGlob(<span class="string">&quot;templates/**/*&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    r.GET(<span class="string">&quot;/&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.HTML(http.StatusOK, <span class="string">&quot;index.html&quot;</span>, gin.H&#123;</span><br><span class="line">            <span class="string">&quot;title&quot;</span>: <span class="string">&quot;首页&quot;</span>,</span><br><span class="line">            <span class="string">&quot;text&quot;</span>:  <span class="string">&quot;hello world&quot;</span>,</span><br><span class="line">            <span class="string">&quot;date&quot;</span>:  time.Now(),</span><br><span class="line">            <span class="string">&quot;longText&quot;</span>: <span class="string">&quot;这是一段很长很长的文本内容，用于测试截断功能&quot;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.Run(<span class="string">&quot;:8080&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用自定义函数的模板</strong>：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;define &quot;content&quot;&#125;&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>大写：&#123;&#123;upper .text&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>日期：&#123;&#123;dateFormat .date&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>截断：&#123;&#123;truncate .longText 10&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">&#123;&#123;end&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>条件渲染</strong>：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;define &quot;content&quot;&#125;&#125;</span><br><span class="line">    &#123;&#123;if .user&#125;&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>欢迎回来，&#123;&#123;.user.name&#125;&#125;！<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    &#123;&#123;else&#125;&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>请登录<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    &#123;&#123;end&#125;&#125;</span><br><span class="line">    </span><br><span class="line">    &#123;&#123;if eq .status &quot;success&quot;&#125;&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;success&quot;</span>&gt;</span>操作成功<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    &#123;&#123;else if eq .status &quot;error&quot;&#125;&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;error&quot;</span>&gt;</span>操作失败<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    &#123;&#123;end&#125;&#125;</span><br><span class="line">&#123;&#123;end&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[请求] --&gt; B[Handler]</span><br><span class="line">    B --&gt; C[准备数据]</span><br><span class="line">    C --&gt; D[渲染模板]</span><br><span class="line">    D --&gt; E[返回 HTML]</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了 Gin 的模板渲染功能：</p>
+<ul>
+<li>配置模板引擎</li>
+<li>使用模板继承</li>
+<li>数据绑定到模板</li>
+<li>注册自定义模板函数</li>
+<li>条件渲染和循环渲染</li>
+</ul>
+<p>这些功能可以用于构建传统的服务端渲染应用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://localhost:4000/2026/06/02/ginTemplateRendering/" data-id="cuidLfCWyMWTzHurSAqbmSoUQ" data-title="HTML 模板渲染与数据绑定" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2026/06/02/ginResponseFormat/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          统一响应格式与错误处理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2026/06/02/ginUserAuth/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">用户注册与登录功能实现</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/tags/Go/" style="font-size: 10px;">Go</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCache/">Redis 缓存策略与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginDockerNginx/">Docker 与 Nginx 部署实战</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

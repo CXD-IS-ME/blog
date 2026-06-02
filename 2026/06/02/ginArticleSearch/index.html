@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>文章列表分页与搜索功能实现 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="文章列表分页与搜索功能实现引言文章列表的分页和搜索是博客系统的核心功能之一。本文将介绍如何实现高效的分页查询和全文搜索功能。 知识点概览1. 分页查询使用 LIMIT 和 OFFSET 实现分页，同时返回总数用于计算页数。 2. 关键词搜索使用 LIKE 查询或全文索引实现关键词搜索。 3. 标签筛选结合标签关联表进行筛选。 4. 排序支持按时间、阅读量等字段排序。 代码示例分页查询： 12345">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文章列表分页与搜索功能实现">
+<meta property="og:url" content="http://localhost:4000/2026/06/02/ginArticleSearch/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="文章列表分页与搜索功能实现引言文章列表的分页和搜索是博客系统的核心功能之一。本文将介绍如何实现高效的分页查询和全文搜索功能。 知识点概览1. 分页查询使用 LIMIT 和 OFFSET 实现分页，同时返回总数用于计算页数。 2. 关键词搜索使用 LIKE 查询或全文索引实现关键词搜索。 3. 标签筛选结合标签关联表进行筛选。 4. 排序支持按时间、阅读量等字段排序。 代码示例分页查询： 12345">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-02T07:43:37.000Z">
+<meta property="article:modified_time" content="2026-06-02T08:59:25.131Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Gin">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Web">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/categories">分类</a>
+        
+          <a class="main-nav-link" href="/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://localhost:4000"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-ginArticleSearch" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/06/02/ginArticleSearch/" class="article-date">
+  <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      文章列表分页与搜索功能实现
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="文章列表分页与搜索功能实现"><a href="#文章列表分页与搜索功能实现" class="headerlink" title="文章列表分页与搜索功能实现"></a>文章列表分页与搜索功能实现</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>文章列表的分页和搜索是博客系统的核心功能之一。本文将介绍如何实现高效的分页查询和全文搜索功能。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-分页查询"><a href="#1-分页查询" class="headerlink" title="1. 分页查询"></a>1. 分页查询</h4><p>使用 <code>LIMIT</code> 和 <code>OFFSET</code> 实现分页，同时返回总数用于计算页数。</p>
+<h4 id="2-关键词搜索"><a href="#2-关键词搜索" class="headerlink" title="2. 关键词搜索"></a>2. 关键词搜索</h4><p>使用 <code>LIKE</code> 查询或全文索引实现关键词搜索。</p>
+<h4 id="3-标签筛选"><a href="#3-标签筛选" class="headerlink" title="3. 标签筛选"></a>3. 标签筛选</h4><p>结合标签关联表进行筛选。</p>
+<h4 id="4-排序"><a href="#4-排序" class="headerlink" title="4. 排序"></a>4. 排序</h4><p>支持按时间、阅读量等字段排序。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>分页查询</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> ListArticles(page, pageSize <span class="type">int</span>, sortBy <span class="type">string</span>) ([]*Article, <span class="type">int64</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> articles []*Article</span><br><span class="line">    <span class="keyword">var</span> total <span class="type">int64</span></span><br><span class="line">    </span><br><span class="line">    err := s.db.Model(&amp;Article&#123;&#125;).Count(&amp;total).Error</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, <span class="number">0</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    query := s.db.Preload(<span class="string">&quot;Tags&quot;</span>).Order(sortBy)</span><br><span class="line">    </span><br><span class="line">    err = query.</span><br><span class="line">        Limit(pageSize).</span><br><span class="line">        Offset((page - <span class="number">1</span>) * pageSize).</span><br><span class="line">        Find(&amp;articles).Error</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> articles, total, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键词搜索</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> SearchArticles(keyword <span class="type">string</span>, page, pageSize <span class="type">int</span>) ([]*Article, <span class="type">int64</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> articles []*Article</span><br><span class="line">    <span class="keyword">var</span> total <span class="type">int64</span></span><br><span class="line">    </span><br><span class="line">    query := s.db.Preload(<span class="string">&quot;Tags&quot;</span>).</span><br><span class="line">        Where(<span class="string">&quot;title LIKE ? OR content LIKE ?&quot;</span>, </span><br><span class="line">            <span class="string">&quot;%&quot;</span>+keyword+<span class="string">&quot;%&quot;</span>, <span class="string">&quot;%&quot;</span>+keyword+<span class="string">&quot;%&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    err := query.Count(&amp;total).Error</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, <span class="number">0</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    err = query.</span><br><span class="line">        Order(<span class="string">&quot;created_at DESC&quot;</span>).</span><br><span class="line">        Limit(pageSize).</span><br><span class="line">        Offset((page - <span class="number">1</span>) * pageSize).</span><br><span class="line">        Find(&amp;articles).Error</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> articles, total, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>组合筛选</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *ArticleService)</span></span> FilterArticles(filters <span class="keyword">map</span>[<span class="type">string</span>]<span class="keyword">interface</span>&#123;&#125;, page, pageSize <span class="type">int</span>) ([]*Article, <span class="type">int64</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> articles []*Article</span><br><span class="line">    <span class="keyword">var</span> total <span class="type">int64</span></span><br><span class="line">    </span><br><span class="line">    query := s.db.Preload(<span class="string">&quot;Tags&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 关键词筛选</span></span><br><span class="line">    <span class="keyword">if</span> keyword, ok := filters[<span class="string">&quot;keyword&quot;</span>].(<span class="type">string</span>); ok &amp;&amp; keyword != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">        query = query.Where(<span class="string">&quot;title LIKE ? OR content LIKE ?&quot;</span>, </span><br><span class="line">            <span class="string">&quot;%&quot;</span>+keyword+<span class="string">&quot;%&quot;</span>, <span class="string">&quot;%&quot;</span>+keyword+<span class="string">&quot;%&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 标签筛选</span></span><br><span class="line">    <span class="keyword">if</span> tagName, ok := filters[<span class="string">&quot;tag&quot;</span>].(<span class="type">string</span>); ok &amp;&amp; tagName != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">        query = query.Joins(<span class="string">&quot;JOIN article_tags ON articles.id = article_tags.article_id&quot;</span>).</span><br><span class="line">            Joins(<span class="string">&quot;JOIN tags ON tags.id = article_tags.tag_id&quot;</span>).</span><br><span class="line">            Where(<span class="string">&quot;tags.name = ?&quot;</span>, tagName)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 作者筛选</span></span><br><span class="line">    <span class="keyword">if</span> author, ok := filters[<span class="string">&quot;author&quot;</span>].(<span class="type">string</span>); ok &amp;&amp; author != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">        query = query.Where(<span class="string">&quot;author = ?&quot;</span>, author)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    err := query.Count(&amp;total).Error</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, <span class="number">0</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    err = query.</span><br><span class="line">        Order(<span class="string">&quot;created_at DESC&quot;</span>).</span><br><span class="line">        Limit(pageSize).</span><br><span class="line">        Offset((page - <span class="number">1</span>) * pageSize).</span><br><span class="line">        Find(&amp;articles).Error</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> articles, total, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Controller 层</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *ArticleController)</span></span> List(ctx *gin.Context) &#123;</span><br><span class="line">    page, _ := strconv.Atoi(ctx.DefaultQuery(<span class="string">&quot;page&quot;</span>, <span class="string">&quot;1&quot;</span>))</span><br><span class="line">    pageSize, _ := strconv.Atoi(ctx.DefaultQuery(<span class="string">&quot;pageSize&quot;</span>, <span class="string">&quot;10&quot;</span>))</span><br><span class="line">    keyword := ctx.Query(<span class="string">&quot;keyword&quot;</span>)</span><br><span class="line">    tag := ctx.Query(<span class="string">&quot;tag&quot;</span>)</span><br><span class="line">    author := ctx.Query(<span class="string">&quot;author&quot;</span>)</span><br><span class="line">    sortBy := ctx.DefaultQuery(<span class="string">&quot;sortBy&quot;</span>, <span class="string">&quot;created_at DESC&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    filters := <span class="keyword">map</span>[<span class="type">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;</span><br><span class="line">        <span class="string">&quot;keyword&quot;</span>: keyword,</span><br><span class="line">        <span class="string">&quot;tag&quot;</span>:     tag,</span><br><span class="line">        <span class="string">&quot;author&quot;</span>:  author,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    articles, total, err := c.articleService.FilterArticles(filters, page, pageSize)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        ctx.JSON(http.StatusInternalServerError, gin.H&#123;<span class="string">&quot;error&quot;</span>: err.Error()&#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ctx.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">        <span class="string">&quot;data&quot;</span>: articles,</span><br><span class="line">        <span class="string">&quot;pagination&quot;</span>: gin.H&#123;</span><br><span class="line">            <span class="string">&quot;page&quot;</span>:     page,</span><br><span class="line">            <span class="string">&quot;pageSize&quot;</span>: pageSize,</span><br><span class="line">            <span class="string">&quot;total&quot;</span>:    total,</span><br><span class="line">            <span class="string">&quot;pages&quot;</span>:    (total + <span class="type">int64</span>(pageSize) - <span class="number">1</span>) / <span class="type">int64</span>(pageSize),</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *ArticleController)</span></span> Search(ctx *gin.Context) &#123;</span><br><span class="line">    keyword := ctx.Query(<span class="string">&quot;q&quot;</span>)</span><br><span class="line">    page, _ := strconv.Atoi(ctx.DefaultQuery(<span class="string">&quot;page&quot;</span>, <span class="string">&quot;1&quot;</span>))</span><br><span class="line">    pageSize, _ := strconv.Atoi(ctx.DefaultQuery(<span class="string">&quot;pageSize&quot;</span>, <span class="string">&quot;10&quot;</span>))</span><br><span class="line">    </span><br><span class="line">    articles, total, err := c.articleService.SearchArticles(keyword, page, pageSize)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        ctx.JSON(http.StatusInternalServerError, gin.H&#123;<span class="string">&quot;error&quot;</span>: err.Error()&#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ctx.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">        <span class="string">&quot;data&quot;</span>:       articles,</span><br><span class="line">        <span class="string">&quot;keyword&quot;</span>:    keyword,</span><br><span class="line">        <span class="string">&quot;pagination&quot;</span>: gin.H&#123;</span><br><span class="line">            <span class="string">&quot;page&quot;</span>:     page,</span><br><span class="line">            <span class="string">&quot;pageSize&quot;</span>: pageSize,</span><br><span class="line">            <span class="string">&quot;total&quot;</span>:    total,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>路由定义</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SetupRouter</span><span class="params">(articleController *controller.ArticleController)</span></span> *gin.Engine &#123;</span><br><span class="line">    r := gin.Default()</span><br><span class="line">    </span><br><span class="line">    v1 := r.Group(<span class="string">&quot;/api/v1&quot;</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        articles := v1.Group(<span class="string">&quot;/articles&quot;</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            articles.GET(<span class="string">&quot;/&quot;</span>, articleController.List)      <span class="comment">// 列表（支持筛选）</span></span><br><span class="line">            articles.GET(<span class="string">&quot;/search&quot;</span>, articleController.Search) <span class="comment">// 搜索</span></span><br><span class="line">            articles.GET(<span class="string">&quot;/:id&quot;</span>, articleController.Get)    <span class="comment">// 详情</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> r</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试命令</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取列表（默认分页）</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles</span><br><span class="line"></span><br><span class="line"><span class="comment"># 分页查询</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles?page=2&amp;pageSize=10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关键词搜索</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles/search?q=Gin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 标签筛选</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles?tag=Go</span><br><span class="line"></span><br><span class="line"><span class="comment"># 组合筛选</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles?keyword=Gin&amp;tag=Go&amp;page=1&amp;pageSize=10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 排序</span></span><br><span class="line">curl http://localhost:8080/api/v1/articles?sortBy=created_at%20ASC</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[请求] --&gt; B[解析参数]</span><br><span class="line">    B --&gt; C&#123;有筛选条件?&#125;</span><br><span class="line">    C --&gt;|是| D[构建过滤查询]</span><br><span class="line">    C --&gt;|否| E[普通查询]</span><br><span class="line">    D --&gt; F[分页处理]</span><br><span class="line">    E --&gt; F</span><br><span class="line">    F --&gt; G[查询总数]</span><br><span class="line">    G --&gt; H[查询数据]</span><br><span class="line">    H --&gt; I[返回结果]</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了文章列表的分页和搜索功能：</p>
+<ul>
+<li>实现基本的分页查询</li>
+<li>支持关键词全文搜索</li>
+<li>支持标签和作者筛选</li>
+<li>组合多个筛选条件</li>
+<li>返回分页元信息</li>
+</ul>
+<p>这些功能可以提升用户体验，让用户快速找到感兴趣的内容。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://localhost:4000/2026/06/02/ginArticleSearch/" data-id="cuidcbUFB9LsNLIshCaJWdpkV" data-title="文章列表分页与搜索功能实现" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2026/06/02/ginArticleTag/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          文章与标签的多对多关系设计
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2026/06/02/ginCrudApi/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">RESTful CRUD API 设计与实现</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/tags/Go/" style="font-size: 10px;">Go</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCache/">Redis 缓存策略与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
+          </li>
+        
+          <li>
+            <a href="/2026/06/02/ginDockerNginx/">Docker 与 Nginx 部署实战</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
