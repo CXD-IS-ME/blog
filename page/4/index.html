@@ -9,7 +9,7 @@
   <meta name="description" content="专注于 Go 语言、Gin Web 框架、数据库、并发编程等后端技术分享">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Go Tech Blog">
-<meta property="og:url" content="http://localhost:4000/page/4/index.html">
+<meta property="og:url" content="https://cxd-is-me.github.io/blog/page/4/index.html">
 <meta property="og:site_name" content="Go Tech Blog">
 <meta property="og:description" content="专注于 Go 语言、Gin Web 框架、数据库、并发编程等后端技术分享">
 <meta property="og:locale" content="zh_CN">
@@ -17,18 +17,18 @@
 <meta property="article:tag" content="Go, Gin, Web Development, Backend, Database, Concurrency">
 <meta name="twitter:card" content="summary">
   
-    <link rel="alternate" href="/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+    <link rel="alternate" href="/blog/atom.xml" title="Go Tech Blog" type="application/atom+xml">
   
   
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="shortcut icon" href="/blog/favicon.ico">
   
   
   
-<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/blog/css/style.css">
 
   
     
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
 
   
   
@@ -44,11 +44,11 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">Go Tech Blog</a>
+        <a href="/blog/" id="logo">Go Tech Blog</a>
       </h1>
       
         <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">Go Developer</a>
+          <a href="/blog/" id="subtitle">Go Developer</a>
         </h2>
       
     </div>
@@ -56,13 +56,13 @@
       <nav id="main-nav">
         <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
         
-          <a class="main-nav-link" href="/">首页</a>
+          <a class="main-nav-link" href="/blog/">首页</a>
         
-          <a class="main-nav-link" href="/archives">归档</a>
+          <a class="main-nav-link" href="/blog/archives">归档</a>
         
-          <a class="main-nav-link" href="/categories">分类</a>
+          <a class="main-nav-link" href="/blog/categories">分类</a>
         
-          <a class="main-nav-link" href="/tags">标签</a>
+          <a class="main-nav-link" href="/blog/tags">标签</a>
         
       </nav>
       <nav id="sub-nav">
@@ -74,12 +74,12 @@
           
         
         
-          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
         
         <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://localhost:4000"></form>
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cxd-is-me.github.io/blog"></form>
       </div>
     </div>
   </div>
@@ -88,14 +88,14 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-ginUserAuth" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post-ginStructuredLogging" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2026/06/02/ginUserAuth/" class="article-date">
+    <a href="/blog/2026/06/02/ginStructuredLogging/" class="article-date">
   <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+    <a class="article-category-link" href="/blog/categories/Go/">Go</a>►<a class="article-category-link" href="/blog/categories/Go/Gin/">Gin</a>
   </div>
 
   </div>
@@ -106,7 +106,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/06/02/ginUserAuth/">用户注册与登录功能实现</a>
+      <a class="p-name article-title" href="/blog/2026/06/02/ginStructuredLogging/">结构化日志与监控</a>
     </h1>
   
 
@@ -114,44 +114,51 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="用户注册与登录功能实现"><a href="#用户注册与登录功能实现" class="headerlink" title="用户注册与登录功能实现"></a>用户注册与登录功能实现</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>用户注册和登录是任何 Web 应用的核心功能之一。本文将基于分层架构实现完整的用户注册和登录功能，包括密码加密、注册验证、JWT 签发等功能。</p>
-<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-密码加密"><a href="#1-密码加密" class="headerlink" title="1. 密码加密"></a>1. 密码加密</h4><p>使用 <code>bcrypt</code> 对用户密码进行加密存储，避免明文密码泄露。</p>
-<h4 id="2-注册验证"><a href="#2-注册验证" class="headerlink" title="2. 注册验证"></a>2. 注册验证</h4><p>验证用户名、邮箱是否已存在，密码强度是否符合要求。</p>
-<h4 id="3-JWT-签发"><a href="#3-JWT-签发" class="headerlink" title="3. JWT 签发"></a>3. JWT 签发</h4><p>登录成功后生成 JWT，用于后续请求的身份验证。</p>
-<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>model&#x2F;user.go</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> model</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;gorm.io/gorm&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    gorm.Model</span><br><span class="line">    Username <span class="type">string</span> <span class="string">`gorm:&quot;type:varchar(50);unique;not null&quot; json:&quot;username&quot;`</span></span><br><span class="line">    Email    <span class="type">string</span> <span class="string">`gorm:&quot;type:varchar(100);unique;not null&quot; json:&quot;email&quot;`</span></span><br><span class="line">    Password <span class="type">string</span> <span class="string">`gorm:&quot;type:varchar(255);not null&quot; json:&quot;-&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h2 id="结构化日志与监控"><a href="#结构化日志与监控" class="headerlink" title="结构化日志与监控"></a>结构化日志与监控</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>在生产环境中，结构化日志和监控是排查问题和保障系统稳定的关键。本文将介绍如何在 Gin 项目中实现结构化日志和基础监控。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-结构化日志"><a href="#1-结构化日志" class="headerlink" title="1. 结构化日志"></a>1. 结构化日志</h4><p>使用 JSON 格式输出日志，便于日志分析工具解析。</p>
+<h4 id="2-日志级别"><a href="#2-日志级别" class="headerlink" title="2. 日志级别"></a>2. 日志级别</h4><p>区分 Debug、Info、Warn、Error、Fatal 等不同级别的日志。</p>
+<h4 id="3-请求追踪"><a href="#3-请求追踪" class="headerlink" title="3. 请求追踪"></a>3. 请求追踪</h4><p>为每个请求分配唯一 ID，便于追踪请求链路。</p>
+<h4 id="4-基础监控"><a href="#4-基础监控" class="headerlink" title="4. 基础监控"></a>4. 基础监控</h4><p>记录请求耗时、响应状态码等指标。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>使用 zap 实现结构化日志</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> logger</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">    <span class="string">&quot;go.uber.org/zap&quot;</span></span><br><span class="line">    <span class="string">&quot;go.uber.org/zap/zapcore&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> logger *zap.Logger</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">InitLogger</span><span class="params">()</span></span> &#123;</span><br><span class="line">    config := zap.NewProductionConfig()</span><br><span class="line">    config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder</span><br><span class="line">    <span class="keyword">var</span> err <span class="type">error</span></span><br><span class="line">    logger, err = config.Build()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetLogger</span><span class="params">()</span></span> *zap.Logger &#123;</span><br><span class="line">    <span class="keyword">return</span> logger</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GinLogger</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        start := time.Now()</span><br><span class="line">        path := c.Request.URL.Path</span><br><span class="line">        query := c.Request.URL.RawQuery</span><br><span class="line">        </span><br><span class="line">        c.Next()</span><br><span class="line">        </span><br><span class="line">        latency := time.Since(start)</span><br><span class="line">        status := c.Writer.Status()</span><br><span class="line">        method := c.Request.Method</span><br><span class="line">        clientIP := c.ClientIP()</span><br><span class="line">        requestID := c.GetString(<span class="string">&quot;request_id&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        logger.Info(<span class="string">&quot;request&quot;</span>,</span><br><span class="line">            zap.String(<span class="string">&quot;request_id&quot;</span>, requestID),</span><br><span class="line">            zap.String(<span class="string">&quot;method&quot;</span>, method),</span><br><span class="line">            zap.String(<span class="string">&quot;path&quot;</span>, path),</span><br><span class="line">            zap.String(<span class="string">&quot;query&quot;</span>, query),</span><br><span class="line">            zap.Int(<span class="string">&quot;status&quot;</span>, status),</span><br><span class="line">            zap.Duration(<span class="string">&quot;latency&quot;</span>, latency),</span><br><span class="line">            zap.String(<span class="string">&quot;client_ip&quot;</span>, clientIP),</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>service&#x2F;user.go</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;gin-blog/internal/model&quot;</span></span><br><span class="line">    <span class="string">&quot;golang.org/x/crypto/bcrypt&quot;</span></span><br><span class="line">    <span class="string">&quot;gorm.io/gorm&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> UserService <span class="keyword">struct</span> &#123;</span><br><span class="line">    db *gorm.DB</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewUserService</span><span class="params">(db *gorm.DB)</span></span> *UserService &#123;</span><br><span class="line">    <span class="keyword">return</span> &amp;UserService&#123;db: db&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *UserService)</span></span> Register(username, email, password <span class="type">string</span>) <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> existingUser model.User</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := s.db.Where(<span class="string">&quot;username = ?&quot;</span>, username).First(&amp;existingUser).Error; err == <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> errors.New(<span class="string">&quot;username already exists&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := s.db.Where(<span class="string">&quot;email = ?&quot;</span>, email).First(&amp;existingUser).Error; err == <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> errors.New(<span class="string">&quot;email already exists&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    hashedPassword, err := bcrypt.GenerateFromPassword([]<span class="type">byte</span>(password), bcrypt.DefaultCost)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    user := model.User&#123;</span><br><span class="line">        Username: username,</span><br><span class="line">        Email:    email,</span><br><span class="line">        Password: <span class="type">string</span>(hashedPassword),</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> s.db.Create(&amp;user).Error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *UserService)</span></span> Login(username, password <span class="type">string</span>) (*model.User, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> user model.User</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := s.db.Where(<span class="string">&quot;username = ?&quot;</span>, username).First(&amp;user).Error; err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">&quot;invalid credentials&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := bcrypt.CompareHashAndPassword([]<span class="type">byte</span>(user.Password), []<span class="type">byte</span>(password)); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">&quot;invalid credentials&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> &amp;user, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>请求 ID 中间件</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RequestIDMiddleware</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        requestID := uuid.New().String()</span><br><span class="line">        c.Set(<span class="string">&quot;request_id&quot;</span>, requestID)</span><br><span class="line">        c.Header(<span class="string">&quot;X-Request-ID&quot;</span>, requestID)</span><br><span class="line">        c.Next()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>controller&#x2F;user.go</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> controller</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;gin-blog/internal/service&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">    <span class="string">&quot;net/http&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> UserController <span class="keyword">struct</span> &#123;</span><br><span class="line">    userService *service.UserService</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewUserController</span><span class="params">(userService *service.UserService)</span></span> *UserController &#123;</span><br><span class="line">    <span class="keyword">return</span> &amp;UserController&#123;userService: userService&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> RegisterRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">    Username <span class="type">string</span> <span class="string">`json:&quot;username&quot; binding:&quot;required,min=3,max=20&quot;`</span></span><br><span class="line">    Email    <span class="type">string</span> <span class="string">`json:&quot;email&quot; binding:&quot;required,email&quot;`</span></span><br><span class="line">    Password <span class="type">string</span> <span class="string">`json:&quot;password&quot; binding:&quot;required,min=6&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> LoginRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">    Username <span class="type">string</span> <span class="string">`json:&quot;username&quot; binding:&quot;required&quot;`</span></span><br><span class="line">    Password <span class="type">string</span> <span class="string">`json:&quot;password&quot; binding:&quot;required&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *UserController)</span></span> Register(ctx *gin.Context) &#123;</span><br><span class="line">    <span class="keyword">var</span> req RegisterRequest</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := ctx.ShouldBindJSON(&amp;req); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        ctx.JSON(http.StatusBadRequest, gin.H&#123;<span class="string">&quot;error&quot;</span>: err.Error()&#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := c.userService.Register(req.Username, req.Email, req.Password); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        ctx.JSON(http.StatusBadRequest, gin.H&#123;<span class="string">&quot;error&quot;</span>: err.Error()&#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ctx.JSON(http.StatusOK, gin.H&#123;<span class="string">&quot;message&quot;</span>: <span class="string">&quot;user registered successfully&quot;</span>&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *UserController)</span></span> Login(ctx *gin.Context) &#123;</span><br><span class="line">    <span class="keyword">var</span> req LoginRequest</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := ctx.ShouldBindJSON(&amp;req); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        ctx.JSON(http.StatusBadRequest, gin.H&#123;<span class="string">&quot;error&quot;</span>: err.Error()&#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    user, err := c.userService.Login(req.Username, req.Password)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        ctx.JSON(http.StatusUnauthorized, gin.H&#123;<span class="string">&quot;error&quot;</span>: err.Error()&#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    token, err := generateToken(user.ID, user.Username)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        ctx.JSON(http.StatusInternalServerError, gin.H&#123;<span class="string">&quot;error&quot;</span>: <span class="string">&quot;failed to generate token&quot;</span>&#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ctx.JSON(http.StatusOK, gin.H&#123;<span class="string">&quot;token&quot;</span>: token&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>记录错误日志</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ErrorHandler</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.Next()</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(c.Errors) &gt; <span class="number">0</span> &#123;</span><br><span class="line">            err := c.Errors.Last()</span><br><span class="line">            requestID := c.GetString(<span class="string">&quot;request_id&quot;</span>)</span><br><span class="line">            </span><br><span class="line">            logger.Error(<span class="string">&quot;request error&quot;</span>,</span><br><span class="line">                zap.String(<span class="string">&quot;request_id&quot;</span>, requestID),</span><br><span class="line">                zap.String(<span class="string">&quot;path&quot;</span>, c.Request.URL.Path),</span><br><span class="line">                zap.String(<span class="string">&quot;error&quot;</span>, err.Error()),</span><br><span class="line">            )</span><br><span class="line">            </span><br><span class="line">            c.JSON(http.StatusInternalServerError, gin.H&#123;</span><br><span class="line">                <span class="string">&quot;error&quot;</span>:       <span class="string">&quot;internal server error&quot;</span>,</span><br><span class="line">                <span class="string">&quot;request_id&quot;</span>: requestID,</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>router&#x2F;router.go</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> router</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;gin-blog/internal/controller&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SetupRouter</span><span class="params">(userController *controller.UserController)</span></span> *gin.Engine &#123;</span><br><span class="line">    r := gin.Default()</span><br><span class="line">    </span><br><span class="line">    api := r.Group(<span class="string">&quot;/api&quot;</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        auth := api.Group(<span class="string">&quot;/auth&quot;</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            auth.POST(<span class="string">&quot;/register&quot;</span>, userController.Register)</span><br><span class="line">            auth.POST(<span class="string">&quot;/login&quot;</span>, userController.Login)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> r</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>性能监控中间件</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Metrics <span class="keyword">struct</span> &#123;</span><br><span class="line">    requestCount     <span class="type">int64</span></span><br><span class="line">    totalLatency     time.Duration</span><br><span class="line">    statusCodeCounts <span class="keyword">map</span>[<span class="type">int</span>]<span class="type">int64</span></span><br><span class="line">    mu               sync.Mutex</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> metrics = &amp;Metrics&#123;</span><br><span class="line">    statusCodeCounts: <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="type">int</span>]<span class="type">int64</span>),</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MetricsMiddleware</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        start := time.Now()</span><br><span class="line">        </span><br><span class="line">        c.Next()</span><br><span class="line">        </span><br><span class="line">        latency := time.Since(start)</span><br><span class="line">        status := c.Writer.Status()</span><br><span class="line">        </span><br><span class="line">        metrics.mu.Lock()</span><br><span class="line">        metrics.requestCount++</span><br><span class="line">        metrics.totalLatency += latency</span><br><span class="line">        metrics.statusCodeCounts[status]++</span><br><span class="line">        metrics.mu.Unlock()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetMetrics</span><span class="params">()</span></span> <span class="keyword">map</span>[<span class="type">string</span>]<span class="keyword">interface</span>&#123;&#125; &#123;</span><br><span class="line">    metrics.mu.Lock()</span><br><span class="line">    <span class="keyword">defer</span> metrics.mu.Unlock()</span><br><span class="line">    </span><br><span class="line">    avgLatency := time.Duration(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">if</span> metrics.requestCount &gt; <span class="number">0</span> &#123;</span><br><span class="line">        avgLatency = metrics.totalLatency / time.Duration(metrics.requestCount)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">map</span>[<span class="type">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;</span><br><span class="line">        <span class="string">&quot;request_count&quot;</span>:      metrics.requestCount,</span><br><span class="line">        <span class="string">&quot;total_latency&quot;</span>:      metrics.totalLatency.String(),</span><br><span class="line">        <span class="string">&quot;average_latency&quot;</span>:    avgLatency.String(),</span><br><span class="line">        <span class="string">&quot;status_code_counts&quot;</span>: metrics.statusCodeCounts,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>测试命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注册用户</span></span><br><span class="line">curl -X POST -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">    -d <span class="string">&#x27;&#123;&quot;username&quot;:&quot;john&quot;,&quot;email&quot;:&quot;john@example.com&quot;,&quot;password&quot;:&quot;123456&quot;&#125;&#x27;</span> \</span><br><span class="line">    http://localhost:8080/api/auth/register</span><br><span class="line"></span><br><span class="line"><span class="comment"># 登录</span></span><br><span class="line">curl -X POST -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">    -d <span class="string">&#x27;&#123;&quot;username&quot;:&quot;john&quot;,&quot;password&quot;:&quot;123456&quot;&#125;&#x27;</span> \</span><br><span class="line">    http://localhost:8080/api/auth/login</span><br></pre></td></tr></table></figure>
+<p><strong>暴露监控端点</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    logger.InitLogger()</span><br><span class="line">    <span class="keyword">defer</span> logger.GetLogger().Sync()</span><br><span class="line">    </span><br><span class="line">    r := gin.New()</span><br><span class="line">    </span><br><span class="line">    r.Use(RequestIDMiddleware())</span><br><span class="line">    r.Use(logger.GinLogger())</span><br><span class="line">    r.Use(MetricsMiddleware())</span><br><span class="line">    r.Use(ErrorHandler())</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 监控端点</span></span><br><span class="line">    r.GET(<span class="string">&quot;/metrics&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.JSON(http.StatusOK, GetMetrics())</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.GET(<span class="string">&quot;/articles&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.JSON(http.StatusOK, gin.H&#123;<span class="string">&quot;message&quot;</span>: <span class="string">&quot;articles&quot;</span>&#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    r.Run(<span class="string">&quot;:8080&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant Client as 客户端</span><br><span class="line">    participant Controller as UserController</span><br><span class="line">    participant Service as UserService</span><br><span class="line">    participant DB as 数据库</span><br><span class="line">    </span><br><span class="line">    Client-&gt;&gt;Controller: POST /api/auth/register</span><br><span class="line">    Controller-&gt;&gt;Controller: 参数验证</span><br><span class="line">    Controller-&gt;&gt;Service: Register(username, email, password)</span><br><span class="line">    Service-&gt;&gt;DB: 查询用户名是否存在</span><br><span class="line">    DB--&gt;&gt;Service: 返回结果</span><br><span class="line">    Service-&gt;&gt;DB: 查询邮箱是否存在</span><br><span class="line">    DB--&gt;&gt;Service: 返回结果</span><br><span class="line">    Service-&gt;&gt;Service: bcrypt 加密密码</span><br><span class="line">    Service-&gt;&gt;DB: 创建用户记录</span><br><span class="line">    DB--&gt;&gt;Service: 返回成功</span><br><span class="line">    Service--&gt;&gt;Controller: 返回 nil</span><br><span class="line">    Controller--&gt;&gt;Client: 200 OK</span><br><span class="line">    </span><br><span class="line">    Client-&gt;&gt;Controller: POST /api/auth/login</span><br><span class="line">    Controller-&gt;&gt;Controller: 参数验证</span><br><span class="line">    Controller-&gt;&gt;Service: Login(username, password)</span><br><span class="line">    Service-&gt;&gt;DB: 查询用户</span><br><span class="line">    DB--&gt;&gt;Service: 返回用户记录</span><br><span class="line">    Service-&gt;&gt;Service: bcrypt 验证密码</span><br><span class="line">    Service--&gt;&gt;Controller: 返回用户</span><br><span class="line">    Controller-&gt;&gt;Controller: 生成 JWT</span><br><span class="line">    Controller--&gt;&gt;Client: 200 OK + token</span><br></pre></td></tr></table></figure>
+<p><strong>日志输出示例</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;info&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;ts&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2024-01-01T12:00:00Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;msg&quot;</span><span class="punctuation">:</span> <span class="string">&quot;request&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;request_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;GET&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/articles&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="string">&quot;page=1&amp;pageSize=10&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;status&quot;</span><span class="punctuation">:</span> <span class="number">200</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;latency&quot;</span><span class="punctuation">:</span> <span class="string">&quot;12.345ms&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;client_ip&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.1&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文实现了完整的用户注册和登录功能：</p>
+<p><strong>测试监控端点</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:8080/metrics</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[请求] --&gt; B[RequestID]</span><br><span class="line">    B --&gt; C[GinLogger]</span><br><span class="line">    C --&gt; D[Handler]</span><br><span class="line">    D --&gt; E[Metrics]</span><br><span class="line">    E --&gt; F[返回响应]</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了结构化日志和监控的实现：</p>
 <ul>
-<li>使用 bcrypt 加密密码</li>
-<li>注册时验证用户名和邮箱唯一性</li>
-<li>登录时验证密码并签发 JWT</li>
-<li>采用分层架构，代码结构清晰</li>
+<li>使用 zap 实现结构化日志</li>
+<li>请求 ID 追踪</li>
+<li>性能指标收集</li>
+<li>暴露监控端点</li>
 </ul>
-<p>这些是构建安全可靠的用户认证系统的基础。</p>
+<p>良好的日志和监控系统可以帮助快速定位问题，保障系统稳定运行。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://localhost:4000/2026/06/02/ginUserAuth/" data-id="cuid2HfqqNYAON9Zb0bdaffec" data-title="用户注册与登录功能实现" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/02/ginStructuredLogging/" data-id="cuidZqHg5hXGwav4Ahw-MG7V6" data-title="结构化日志与监控" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Web/" rel="tag">Web</a></li></ul>
 
     </footer>
   </div>
@@ -163,12 +170,12 @@
   
     <article id="post-ginTimeoutContext" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2026/06/02/ginTimeoutContext/" class="article-date">
+    <a href="/blog/2026/06/02/ginTimeoutContext/" class="article-date">
   <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+    <a class="article-category-link" href="/blog/categories/Go/">Go</a>►<a class="article-category-link" href="/blog/categories/Go/Gin/">Gin</a>
   </div>
 
   </div>
@@ -179,7 +186,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/06/02/ginTimeoutContext/">超时控制与优雅降级：Context 包实现</a>
+      <a class="p-name article-title" href="/blog/2026/06/02/ginTimeoutContext/">超时控制与优雅降级：Context 包实现</a>
     </h1>
   
 
@@ -219,11 +226,89 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://localhost:4000/2026/06/02/ginTimeoutContext/" data-id="cuidH3qPepxhYHp3XDg3Rf3HD" data-title="超时控制与优雅降级：Context 包实现" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/02/ginTimeoutContext/" data-id="cuid9J1xnU1hhbESoxHmHQO6K" data-title="超时控制与优雅降级：Context 包实现" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Web/" rel="tag">Web</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-goGmpConcurrency" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/06/02/goGmpConcurrency/" class="article-date">
+  <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/Go/">Go</a>►<a class="article-category-link" href="/blog/categories/Go/Gin/">Gin</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/blog/2026/06/02/goGmpConcurrency/">Go 并发模型 GMP：为高并发做准备</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="Go-并发模型-GMP：为高并发做准备"><a href="#Go-并发模型-GMP：为高并发做准备" class="headerlink" title="Go 并发模型 GMP：为高并发做准备"></a>Go 并发模型 GMP：为高并发做准备</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>Go 语言以其出色的并发支持而闻名，这得益于其独特的 GMP 并发模型。理解 GMP 模型对于编写高效的并发程序至关重要。本文将深入解析 GMP 模型的原理和工作机制。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-GMP-模型概述"><a href="#1-GMP-模型概述" class="headerlink" title="1. GMP 模型概述"></a>1. GMP 模型概述</h4><p>GMP 是 Go 语言运行时的并发调度模型：</p>
+<ul>
+<li><strong>G（Goroutine）</strong>：轻量级线程，由 Go 运行时管理</li>
+<li><strong>M（Machine）</strong>：操作系统线程</li>
+<li><strong>P（Processor）</strong>：处理器，负责调度 Goroutine</li>
+</ul>
+<h4 id="2-Goroutine"><a href="#2-Goroutine" class="headerlink" title="2. Goroutine"></a>2. Goroutine</h4><p>Goroutine 是 Go 语言中的轻量级执行单元，相比操作系统线程，Goroutine 更加轻量：</p>
+<ul>
+<li>初始栈大小约 2KB</li>
+<li>可以动态扩展收缩大小</li>
+<li>创建和切换开销低</li>
+</ul>
+<h4 id="3-M-和-P-的关系"><a href="#3-M-和-P-的关系" class="headerlink" title="3. M 和 P 的关系"></a>3. M 和 P 的关系</h4><ul>
+<li>M 是真正执行代码的操作系统线程</li>
+<li>P 是处理器，包含运行 Goroutine 所需的上下文</li>
+<li>M 必须绑定一个 P 才能执行 Goroutine</li>
+</ul>
+<h4 id="4-GOMAXPROCS"><a href="#4-GOMAXPROCS" class="headerlink" title="4. GOMAXPROCS"></a>4. GOMAXPROCS</h4><p><code>runtime.GOMAXPROCS(n)</code> 设置同时执行 Goroutine 的最大 CPU 核心数。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;runtime&quot;</span></span><br><span class="line">    <span class="string">&quot;sync&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前 GOMAXPROCS 值</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Current GOMAXPROCS:&quot;</span>, runtime.GOMAXPROCS(<span class="number">0</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置使用 4 个 CPU 核心</span></span><br><span class="line">    runtime.GOMAXPROCS(<span class="number">4</span>)</span><br><span class="line">    fmt.Println(<span class="string">&quot;Updated GOMAXPROCS:&quot;</span>, runtime.GOMAXPROCS(<span class="number">0</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 演示大量 Goroutine 调度</span></span><br><span class="line">    <span class="keyword">const</span> numGoroutines = <span class="number">10000</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">    wg.Add(numGoroutines)</span><br><span class="line">    </span><br><span class="line">    start := time.Now()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; numGoroutines; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(id <span class="type">int</span>)</span></span> &#123;</span><br><span class="line">            <span class="keyword">defer</span> wg.Done()</span><br><span class="line">            <span class="comment">// 模拟计算任务</span></span><br><span class="line">            sum := <span class="number">0</span></span><br><span class="line">            <span class="keyword">for</span> j := <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++ &#123;</span><br><span class="line">                sum += j</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 每 1000 个 Goroutine 打印一次</span></span><br><span class="line">            <span class="keyword">if</span> id%<span class="number">1000</span> == <span class="number">0</span> &#123;</span><br><span class="line">                fmt.Printf(<span class="string">&quot;Goroutine %d completed, sum=%d\n&quot;</span>, id, sum)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;(i)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    wg.Wait()</span><br><span class="line">    </span><br><span class="line">    elapsed := time.Since(start)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Completed %d goroutines in %v\n&quot;</span>, numGoroutines, elapsed)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 查看当前 Goroutine 数量</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Current goroutines:&quot;</span>, runtime.NumGoroutine())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">go run main.go</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 -race 检测数据竞争</span></span><br><span class="line">go run -race main.go</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    subgraph OS</span><br><span class="line">        M1[M1 - OS Thread]</span><br><span class="line">        M2[M2 - OS Thread]</span><br><span class="line">        M3[M3 - OS Thread]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    subgraph Go Runtime</span><br><span class="line">        P1[P1 - Processor]</span><br><span class="line">        P2[P2 - Processor]</span><br><span class="line">        P3[P3 - Processor]</span><br><span class="line">        P4[P4 - Processor]</span><br><span class="line">        </span><br><span class="line">        G1[G1 - Goroutine]</span><br><span class="line">        G2[G2 - Goroutine]</span><br><span class="line">        G3[G3 - Goroutine]</span><br><span class="line">        G4[G4 - Goroutine]</span><br><span class="line">        G5[G5 - Goroutine]</span><br><span class="line">        G6[G6 - Goroutine]</span><br><span class="line">        </span><br><span class="line">        LocalQueue1[(Local Queue)]</span><br><span class="line">        LocalQueue2[(Local Queue)]</span><br><span class="line">        LocalQueue3[(Local Queue)]</span><br><span class="line">        LocalQueue4[(Local Queue)]</span><br><span class="line">        </span><br><span class="line">        GlobalQueue[(Global Queue)]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    M1 --&gt; P1</span><br><span class="line">    M2 --&gt; P2</span><br><span class="line">    M3 --&gt; P3</span><br><span class="line">    </span><br><span class="line">    P1 --&gt; G1</span><br><span class="line">    P1 --&gt; LocalQueue1</span><br><span class="line">    P2 --&gt; G2</span><br><span class="line">    P2 --&gt; LocalQueue2</span><br><span class="line">    P3 --&gt; G3</span><br><span class="line">    P3 --&gt; LocalQueue3</span><br><span class="line">    P4 --&gt; LocalQueue4</span><br><span class="line">    </span><br><span class="line">    GlobalQueue --&gt; G4</span><br><span class="line">    GlobalQueue --&gt; G5</span><br><span class="line">    GlobalQueue --&gt; G6</span><br><span class="line">    </span><br><span class="line">    P1 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P2 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P3 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P4 -.窃取.-&gt; GlobalQueue</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了 Go 的 GMP 并发模型：</p>
+<ul>
+<li>G（Goroutine）：轻量级执行单元</li>
+<li>M（Machine）：操作系统线程</li>
+<li>P（Processor）：处理器，管理 Goroutine</li>
+<li>使用 <code>runtime.GOMAXPROCS()</code> 设置并发度</li>
+</ul>
+<p>理解 GMP 模型对于编写高效的并发程序至关重要。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/02/goGmpConcurrency/" data-id="cuidAxApAoc8QtKzmLoKJ_hJf" data-title="Go 并发模型 GMP：为高并发做准备" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Web/" rel="tag">Web</a></li></ul>
 
     </footer>
   </div>
@@ -235,12 +320,12 @@
   
     <article id="post-goConcurrencyBugs" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2026/06/02/goConcurrencyBugs/" class="article-date">
+    <a href="/blog/2026/06/02/goConcurrencyBugs/" class="article-date">
   <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
+    <a class="article-category-link" href="/blog/categories/Go/">Go</a>►<a class="article-category-link" href="/blog/categories/Go/Gin/">Gin</a>
   </div>
 
   </div>
@@ -251,7 +336,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/06/02/goConcurrencyBugs/">常见并发 Bug 与预防</a>
+      <a class="p-name article-title" href="/blog/2026/06/02/goConcurrencyBugs/">常见并发 Bug 与预防</a>
     </h1>
   
 
@@ -305,89 +390,11 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://localhost:4000/2026/06/02/goConcurrencyBugs/" data-id="cuidHzKOo4AmOnzeKiOWgEhRi" data-title="常见并发 Bug 与预防" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/02/goConcurrencyBugs/" data-id="cuid9X4rAQDwi-hTQMDvAZf8Q" data-title="常见并发 Bug 与预防" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-goGmpConcurrency" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2026/06/02/goGmpConcurrency/" class="article-date">
-  <time class="dt-published" datetime="2026-06-02T07:43:37.000Z" itemprop="datePublished">2026-06-02</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Go/">Go</a>►<a class="article-category-link" href="/categories/Go/Gin/">Gin</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2026/06/02/goGmpConcurrency/">Go 并发模型 GMP：为高并发做准备</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="Go-并发模型-GMP：为高并发做准备"><a href="#Go-并发模型-GMP：为高并发做准备" class="headerlink" title="Go 并发模型 GMP：为高并发做准备"></a>Go 并发模型 GMP：为高并发做准备</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>Go 语言以其出色的并发支持而闻名，这得益于其独特的 GMP 并发模型。理解 GMP 模型对于编写高效的并发程序至关重要。本文将深入解析 GMP 模型的原理和工作机制。</p>
-<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-GMP-模型概述"><a href="#1-GMP-模型概述" class="headerlink" title="1. GMP 模型概述"></a>1. GMP 模型概述</h4><p>GMP 是 Go 语言运行时的并发调度模型：</p>
-<ul>
-<li><strong>G（Goroutine）</strong>：轻量级线程，由 Go 运行时管理</li>
-<li><strong>M（Machine）</strong>：操作系统线程</li>
-<li><strong>P（Processor）</strong>：处理器，负责调度 Goroutine</li>
-</ul>
-<h4 id="2-Goroutine"><a href="#2-Goroutine" class="headerlink" title="2. Goroutine"></a>2. Goroutine</h4><p>Goroutine 是 Go 语言中的轻量级执行单元，相比操作系统线程，Goroutine 更加轻量：</p>
-<ul>
-<li>初始栈大小约 2KB</li>
-<li>可以动态扩展收缩大小</li>
-<li>创建和切换开销低</li>
-</ul>
-<h4 id="3-M-和-P-的关系"><a href="#3-M-和-P-的关系" class="headerlink" title="3. M 和 P 的关系"></a>3. M 和 P 的关系</h4><ul>
-<li>M 是真正执行代码的操作系统线程</li>
-<li>P 是处理器，包含运行 Goroutine 所需的上下文</li>
-<li>M 必须绑定一个 P 才能执行 Goroutine</li>
-</ul>
-<h4 id="4-GOMAXPROCS"><a href="#4-GOMAXPROCS" class="headerlink" title="4. GOMAXPROCS"></a>4. GOMAXPROCS</h4><p><code>runtime.GOMAXPROCS(n)</code> 设置同时执行 Goroutine 的最大 CPU 核心数。</p>
-<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;runtime&quot;</span></span><br><span class="line">    <span class="string">&quot;sync&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前 GOMAXPROCS 值</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Current GOMAXPROCS:&quot;</span>, runtime.GOMAXPROCS(<span class="number">0</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置使用 4 个 CPU 核心</span></span><br><span class="line">    runtime.GOMAXPROCS(<span class="number">4</span>)</span><br><span class="line">    fmt.Println(<span class="string">&quot;Updated GOMAXPROCS:&quot;</span>, runtime.GOMAXPROCS(<span class="number">0</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 演示大量 Goroutine 调度</span></span><br><span class="line">    <span class="keyword">const</span> numGoroutines = <span class="number">10000</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">    wg.Add(numGoroutines)</span><br><span class="line">    </span><br><span class="line">    start := time.Now()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; numGoroutines; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(id <span class="type">int</span>)</span></span> &#123;</span><br><span class="line">            <span class="keyword">defer</span> wg.Done()</span><br><span class="line">            <span class="comment">// 模拟计算任务</span></span><br><span class="line">            sum := <span class="number">0</span></span><br><span class="line">            <span class="keyword">for</span> j := <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++ &#123;</span><br><span class="line">                sum += j</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 每 1000 个 Goroutine 打印一次</span></span><br><span class="line">            <span class="keyword">if</span> id%<span class="number">1000</span> == <span class="number">0</span> &#123;</span><br><span class="line">                fmt.Printf(<span class="string">&quot;Goroutine %d completed, sum=%d\n&quot;</span>, id, sum)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;(i)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    wg.Wait()</span><br><span class="line">    </span><br><span class="line">    elapsed := time.Since(start)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Completed %d goroutines in %v\n&quot;</span>, numGoroutines, elapsed)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 查看当前 Goroutine 数量</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Current goroutines:&quot;</span>, runtime.NumGoroutine())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>测试命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">go run main.go</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 -race 检测数据竞争</span></span><br><span class="line">go run -race main.go</span><br></pre></td></tr></table></figure>
-
-<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    subgraph OS</span><br><span class="line">        M1[M1 - OS Thread]</span><br><span class="line">        M2[M2 - OS Thread]</span><br><span class="line">        M3[M3 - OS Thread]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    subgraph Go Runtime</span><br><span class="line">        P1[P1 - Processor]</span><br><span class="line">        P2[P2 - Processor]</span><br><span class="line">        P3[P3 - Processor]</span><br><span class="line">        P4[P4 - Processor]</span><br><span class="line">        </span><br><span class="line">        G1[G1 - Goroutine]</span><br><span class="line">        G2[G2 - Goroutine]</span><br><span class="line">        G3[G3 - Goroutine]</span><br><span class="line">        G4[G4 - Goroutine]</span><br><span class="line">        G5[G5 - Goroutine]</span><br><span class="line">        G6[G6 - Goroutine]</span><br><span class="line">        </span><br><span class="line">        LocalQueue1[(Local Queue)]</span><br><span class="line">        LocalQueue2[(Local Queue)]</span><br><span class="line">        LocalQueue3[(Local Queue)]</span><br><span class="line">        LocalQueue4[(Local Queue)]</span><br><span class="line">        </span><br><span class="line">        GlobalQueue[(Global Queue)]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    M1 --&gt; P1</span><br><span class="line">    M2 --&gt; P2</span><br><span class="line">    M3 --&gt; P3</span><br><span class="line">    </span><br><span class="line">    P1 --&gt; G1</span><br><span class="line">    P1 --&gt; LocalQueue1</span><br><span class="line">    P2 --&gt; G2</span><br><span class="line">    P2 --&gt; LocalQueue2</span><br><span class="line">    P3 --&gt; G3</span><br><span class="line">    P3 --&gt; LocalQueue3</span><br><span class="line">    P4 --&gt; LocalQueue4</span><br><span class="line">    </span><br><span class="line">    GlobalQueue --&gt; G4</span><br><span class="line">    GlobalQueue --&gt; G5</span><br><span class="line">    GlobalQueue --&gt; G6</span><br><span class="line">    </span><br><span class="line">    P1 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P2 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P3 -.窃取.-&gt; GlobalQueue</span><br><span class="line">    P4 -.窃取.-&gt; GlobalQueue</span><br></pre></td></tr></table></figure>
-
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了 Go 的 GMP 并发模型：</p>
-<ul>
-<li>G（Goroutine）：轻量级执行单元</li>
-<li>M（Machine）：操作系统线程</li>
-<li>P（Processor）：处理器，管理 Goroutine</li>
-<li>使用 <code>runtime.GOMAXPROCS()</code> 设置并发度</li>
-</ul>
-<p>理解 GMP 模型对于编写高效的并发程序至关重要。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://localhost:4000/2026/06/02/goGmpConcurrency/" data-id="cuidaw6tzSZld7q77BoI3Gs8M" data-title="Go 并发模型 GMP：为高并发做准备" class="article-share-link"><span class="fa fa-share">分享</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/" rel="tag">Web</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Gin/" rel="tag">Gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Web/" rel="tag">Web</a></li></ul>
 
     </footer>
   </div>
@@ -401,7 +408,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/3/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
+    <a class="extend prev" rel="prev" href="/blog/page/3/">&laquo; 上一页</a><a class="page-number" href="/blog/">1</a><a class="page-number" href="/blog/page/2/">2</a><a class="page-number" href="/blog/page/3/">3</a><span class="page-number current">4</span>
   </nav>
 
 </section>
@@ -412,7 +419,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">分类</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
     </div>
   </div>
 
@@ -422,7 +429,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/tags/Go/" style="font-size: 10px;">Go</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a>
+      <a href="/blog/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/Web/" style="font-size: 10px;">Web</a>
     </div>
   </div>
 
@@ -431,7 +438,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
     </div>
   </div>
 
@@ -444,27 +451,27 @@
       <ul>
         
           <li>
-            <a href="/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
+            <a href="/blog/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
           </li>
         
           <li>
-            <a href="/2026/06/02/ginCache/">Redis 缓存策略与实现</a>
+            <a href="/blog/2026/06/02/ginCache/">Redis 缓存策略与实现</a>
           </li>
         
           <li>
-            <a href="/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
+            <a href="/blog/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
           </li>
         
           <li>
-            <a href="/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
+            <a href="/blog/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
           </li>
         
           <li>
-            <a href="/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
+            <a href="/blog/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
           </li>
         
           <li>
-            <a href="/2026/06/02/ginDockerNginx/">Docker 与 Nginx 部署实战</a>
+            <a href="/blog/2026/06/02/ginFileUpload/">文件上传与静态资源服务</a>
           </li>
         
       </ul>
@@ -492,29 +499,29 @@ Made with ❤️ using Hexo
     </div>
     <nav id="mobile-nav">
   
-    <a href="/" class="mobile-nav-link">首页</a>
+    <a href="/blog/" class="mobile-nav-link">首页</a>
   
-    <a href="/archives" class="mobile-nav-link">归档</a>
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
   
-    <a href="/categories" class="mobile-nav-link">分类</a>
+    <a href="/blog/categories" class="mobile-nav-link">分类</a>
   
-    <a href="/tags" class="mobile-nav-link">标签</a>
+    <a href="/blog/tags" class="mobile-nav-link">标签</a>
   
 </nav>
     
 
 
-<script src="/js/jquery-3.6.4.min.js"></script>
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
 
 
 
   
-<script src="/fancybox/jquery.fancybox.min.js"></script>
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
 
 
 
 
-<script src="/js/script.js"></script>
+<script src="/blog/js/script.js"></script>
 
 
 
