@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>微服务通信基础：RESTful API 与 gRPC | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="微服务通信基础：RESTful API 与 gRPC引言微服务之间需要高效可靠的通信机制。RESTful API 是最广泛使用的同步通信方式，而 gRPC 凭借 Protocol Buffers 和 HTTP&#x2F;2 在性能上具有显著优势。本文将对比这两种通信方式，并给出 Go 语言的实践示例。 知识点概览1. RESTful API 通信基于 HTTP 协议，使用 JSON 格式，简单通用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微服务通信基础：RESTful API 与 gRPC">
+<meta property="og:url" content="https://cxd-is-me.github.io/blog/2026/06/03/microserviceCommunication/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="微服务通信基础：RESTful API 与 gRPC引言微服务之间需要高效可靠的通信机制。RESTful API 是最广泛使用的同步通信方式，而 gRPC 凭借 Protocol Buffers 和 HTTP&#x2F;2 在性能上具有显著优势。本文将对比这两种通信方式，并给出 Go 语言的实践示例。 知识点概览1. RESTful API 通信基于 HTTP 协议，使用 JSON 格式，简单通用">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-03T02:00:02.000Z">
+<meta property="article:modified_time" content="2026-06-03T02:42:52.377Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="RESTful">
+<meta property="article:tag" content="gRPC">
+<meta property="article:tag" content="微服务">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+  
+  
+  <link rel="stylesheet" href="/blog/css/style.css?v=20260602">
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives">归档</a>
+        
+          <a class="main-nav-link" href="/blog/categories">分类</a>
+        
+          <a class="main-nav-link" href="/blog/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cxd-is-me.github.io/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-microserviceCommunication" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/06/03/microserviceCommunication/" class="article-date">
+  <time class="dt-published" datetime="2026-06-03T02:00:02.000Z" itemprop="datePublished">2026-06-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>►<a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      微服务通信基础：RESTful API 与 gRPC
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="微服务通信基础：RESTful-API-与-gRPC"><a href="#微服务通信基础：RESTful-API-与-gRPC" class="headerlink" title="微服务通信基础：RESTful API 与 gRPC"></a>微服务通信基础：RESTful API 与 gRPC</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>微服务之间需要高效可靠的通信机制。RESTful API 是最广泛使用的同步通信方式，而 gRPC 凭借 Protocol Buffers 和 HTTP&#x2F;2 在性能上具有显著优势。本文将对比这两种通信方式，并给出 Go 语言的实践示例。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-RESTful-API-通信"><a href="#1-RESTful-API-通信" class="headerlink" title="1. RESTful API 通信"></a>1. RESTful API 通信</h4><p>基于 HTTP 协议，使用 JSON 格式，简单通用，跨语言兼容性好，适合对外 API 和服务间简单调用。</p>
+<h4 id="2-Protocol-Buffers-定义"><a href="#2-Protocol-Buffers-定义" class="headerlink" title="2. Protocol Buffers 定义"></a>2. Protocol Buffers 定义</h4><p>使用 .proto 文件定义服务接口和消息结构，强类型、跨语言，编译生成客户端和服务端代码。</p>
+<h4 id="3-gRPC-四种调用模式"><a href="#3-gRPC-四种调用模式" class="headerlink" title="3. gRPC 四种调用模式"></a>3. gRPC 四种调用模式</h4><p>一元 RPC、服务端流式、客户端流式、双向流式，覆盖不同通信场景。</p>
+<h4 id="4-通信选型建议"><a href="#4-通信选型建议" class="headerlink" title="4. 通信选型建议"></a>4. 通信选型建议</h4><p>内部服务间高性能通信首选 gRPC，对外 API 和对前端通信使用 RESTful。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>Proto 文件定义</strong>：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// proto/user.proto</span></span><br><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> user;</span><br><span class="line"><span class="keyword">option</span> go_package = <span class="string">&quot;user-service/proto/userpb&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">service </span><span class="title class_">UserService</span> &#123;</span><br><span class="line">  <span class="comment">// 一元 RPC：单次请求-响应</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> GetUser(GetUserRequest) <span class="keyword">returns</span> (GetUserResponse)</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 服务端流式：客户端一次请求，服务端多次响应</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> ListUsers(ListUsersRequest) <span class="keyword">returns</span> (stream User)</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 客户端流式：客户端多次请求，服务端一次响应</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> BatchCreateUsers(stream CreateUserRequest) <span class="keyword">returns</span> (BatchCreateResponse)</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 双向流式：双方独立发送和接收</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> Chat(stream ChatMessage) <span class="keyword">returns</span> (stream ChatMessage)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">User</span> &#123;</span><br><span class="line">  <span class="type">string</span> id = <span class="number">1</span>;</span><br><span class="line">  <span class="type">string</span> username = <span class="number">2</span>;</span><br><span class="line">  <span class="type">string</span> email = <span class="number">3</span>;</span><br><span class="line">  <span class="type">int64</span> created_at = <span class="number">4</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">GetUserRequest</span> &#123;</span><br><span class="line">  <span class="type">string</span> id = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">GetUserResponse</span> &#123;</span><br><span class="line">  User user = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gRPC 服务端实现</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// internal/grpc/user_server.go</span></span><br><span class="line"><span class="keyword">package</span> grpc</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;context&quot;</span></span><br><span class="line">    <span class="string">&quot;user-service/proto/userpb&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> UserServer <span class="keyword">struct</span> &#123;</span><br><span class="line">    userpb.UnimplementedUserServiceServer</span><br><span class="line">    svc *service.UserService</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *UserServer)</span></span> GetUser(ctx context.Context, req *userpb.GetUserRequest) (*userpb.GetUserResponse, <span class="type">error</span>) &#123;</span><br><span class="line">    user, err := s.svc.GetByID(ctx, req.Id)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> &amp;userpb.GetUserResponse&#123;</span><br><span class="line">        User: &amp;userpb.User&#123;</span><br><span class="line">            Id:       user.ID,</span><br><span class="line">            Username: user.Username,</span><br><span class="line">            Email:    user.Email,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 服务端流式</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *UserServer)</span></span> ListUsers(req *userpb.ListUsersRequest, stream userpb.UserService_ListUsersServer) <span class="type">error</span> &#123;</span><br><span class="line">    users, err := s.svc.List(stream.Context(), req.Page, req.PageSize)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> _, u := <span class="keyword">range</span> users &#123;</span><br><span class="line">        <span class="keyword">if</span> err := stream.Send(&amp;userpb.User&#123;</span><br><span class="line">            Id:       u.ID,</span><br><span class="line">            Username: u.Username,</span><br><span class="line">            Email:    u.Email,</span><br><span class="line">        &#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> err</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gRPC 客户端调用</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 订单服务中调用用户服务的 gRPC 客户端</span></span><br><span class="line"><span class="keyword">package</span> client</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;context&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc/credentials/insecure&quot;</span></span><br><span class="line">    <span class="string">&quot;user-service/proto/userpb&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> UserGrpcClient <span class="keyword">struct</span> &#123;</span><br><span class="line">    client userpb.UserServiceClient</span><br><span class="line">    conn   *grpc.ClientConn</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewUserGrpcClient</span><span class="params">(addr <span class="type">string</span>)</span></span> (*UserGrpcClient, <span class="type">error</span>) &#123;</span><br><span class="line">    conn, err := grpc.Dial(addr,</span><br><span class="line">        grpc.WithTransportCredentials(insecure.NewCredentials()),</span><br><span class="line">        grpc.WithBlock(),</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> &amp;UserGrpcClient&#123;</span><br><span class="line">        client: userpb.NewUserServiceClient(conn),</span><br><span class="line">        conn:   conn,</span><br><span class="line">    &#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *UserGrpcClient)</span></span> GetUser(ctx context.Context, userID <span class="type">string</span>) (*userpb.User, <span class="type">error</span>) &#123;</span><br><span class="line">    resp, err := c.client.GetUser(ctx, &amp;userpb.GetUserRequest&#123;Id: userID&#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> resp.User, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *UserGrpcClient)</span></span> Close() <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> c.conn.Close()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gRPC 服务端启动</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// cmd/server/main.go 中添加 gRPC 服务</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startGrpcServer</span><span class="params">(cfg *config.Config, userSvc *service.UserService)</span></span> &#123;</span><br><span class="line">    lis, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, fmt.Sprintf(<span class="string">&quot;:%d&quot;</span>, cfg.Grpc.Port))</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatalf(<span class="string">&quot;gRPC 监听失败: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    s := grpc.NewServer(</span><br><span class="line">        grpc.UnaryInterceptor(grpcMiddleware.LoggingInterceptor),</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    userpb.RegisterUserServiceServer(s, &amp;grpcServer.UserServer&#123;Svc: userSvc&#125;)</span><br><span class="line">    </span><br><span class="line">    log.Printf(<span class="string">&quot;gRPC 服务启动在 :%d&quot;</span>, cfg.Grpc.Port)</span><br><span class="line">    <span class="keyword">if</span> err := s.Serve(lis); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatalf(<span class="string">&quot;gRPC 服务异常: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>RESTful 与 gRPC 同时暴露</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    cfg := config.Load()</span><br><span class="line">    db := initDB(cfg)</span><br><span class="line">    </span><br><span class="line">    userRepo := repository.NewUserRepo(db)</span><br><span class="line">    userSvc := service.NewUserService(userRepo)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// RESTful HTTP 服务（对外暴露）</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        r := gin.Default()</span><br><span class="line">        userHandler := handler.NewUserHandler(userSvc)</span><br><span class="line">        setupRouter(r, userHandler)</span><br><span class="line">        r.Run(fmt.Sprintf(<span class="string">&quot;:%d&quot;</span>, cfg.HTTP.Port))</span><br><span class="line">    &#125;()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// gRPC 服务（内部服务间调用）</span></span><br><span class="line">    <span class="keyword">go</span> startGrpcServer(cfg, userSvc)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 优雅退出</span></span><br><span class="line">    quit := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">    &lt;-quit</span><br><span class="line">    log.Println(<span class="string">&quot;服务正在关闭...&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[客户端] --&gt;|RESTful JSON| B[REST API :8081]</span><br><span class="line">    A2[内部服务] --&gt;|gRPC Protobuf| C[gRPC Server :9081]</span><br><span class="line">    B --&gt; D[Service 层]</span><br><span class="line">    C --&gt; D</span><br><span class="line">    D --&gt; E[Repository 层]</span><br><span class="line">    E --&gt; F[(数据库)]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant Client as 订单服务</span><br><span class="line">    participant gRPC as 用户服务 gRPC</span><br><span class="line">    participant DB as 用户数据库</span><br><span class="line">    </span><br><span class="line">    Client-&gt;&gt;gRPC: GetUser(id=123)</span><br><span class="line">    gRPC-&gt;&gt;DB: SELECT * FROM users WHERE id=123</span><br><span class="line">    DB--&gt;&gt;gRPC: 用户数据</span><br><span class="line">    gRPC--&gt;&gt;Client: User&#123;id, username, email&#125;</span><br><span class="line">    </span><br><span class="line">    Note over Client,gRPC: Protocol Buffers 二进制传输</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">graph LR</span><br><span class="line">    A[RESTful API] --&gt;|适用| B[对外接口]</span><br><span class="line">    A --&gt;|适用| C[前端通信]</span><br><span class="line">    D[gRPC] --&gt;|适用| E[内部服务间调用]</span><br><span class="line">    D --&gt;|适用| F[高性能低延迟场景]</span><br><span class="line">    </span><br><span class="line">    style A fill:#f9f,stroke:#333</span><br><span class="line">    style D fill:#9f9,stroke:#333</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了微服务通信的两种主要方式：</p>
+<ul>
+<li>RESTful API 简单通用，适合对外接口和前端通信</li>
+<li>gRPC 基于 Protobuf 和 HTTP&#x2F;2，性能优越，适合内部服务间调用</li>
+<li>proto 文件作为服务契约，自动生成客户端和服务端代码</li>
+<li>实际项目中可以将两者结合，对外用 REST，对内用 gRPC</li>
+<li>gRPC 支持四种调用模式，满足不同场景需求</li>
+</ul>
+<p>选择合适的通信方式是微服务设计的关键决策之一，下一篇文章将介绍服务注册与发现。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/03/microserviceCommunication/" data-id="cuidMGGpQz7GljEW4vxWO2_sF" data-title="微服务通信基础：RESTful API 与 gRPC" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/RESTful/" rel="tag">RESTful</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/gRPC/" rel="tag">gRPC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/06/03/serviceDiscovery/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          服务注册与发现：Consul 实践
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/06/03/goMicroserviceProject/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Go 微服务项目工程化实践</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">10</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a><span class="category-list-count">9</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/DevOps/">DevOps</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a><span class="category-list-count">1</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/API-%E7%BD%91%E5%85%B3/" style="font-size: 10px;">API 网关</a> <a href="/blog/tags/Consul/" style="font-size: 10px;">Consul</a> <a href="/blog/tags/DevOps/" style="font-size: 10px;">DevOps</a> <a href="/blog/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/blog/tags/Gin/" style="font-size: 16.67px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 20px;">Go</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/Jaeger/" style="font-size: 10px;">Jaeger</a> <a href="/blog/tags/Kubernetes/" style="font-size: 10px;">Kubernetes</a> <a href="/blog/tags/OAuth2/" style="font-size: 10px;">OAuth2</a> <a href="/blog/tags/OpenTelemetry/" style="font-size: 10px;">OpenTelemetry</a> <a href="/blog/tags/RESTful/" style="font-size: 10px;">RESTful</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Web/" style="font-size: 16.67px;">Web</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/%E5%AE%89%E5%85%A8/" style="font-size: 10px;">安全</a> <a href="/blog/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" style="font-size: 10px;">工程化</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/" style="font-size: 10px;">服务发现</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">架构设计</a> <a href="/blog/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" style="font-size: 10px;">消息队列</a> <a href="/blog/tags/%E7%86%94%E6%96%AD/" style="font-size: 10px;">熔断</a> <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 10px;">负载均衡</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" style="font-size: 10px;">配置中心</a> <a href="/blog/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" style="font-size: 10px;">链路追踪</a> <a href="/blog/tags/%E9%99%8D%E7%BA%A7/" style="font-size: 10px;">降级</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/06/">六月 2026</a><span class="archive-list-count">32</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceKubernetes/">微服务容器化部署：Kubernetes 实战</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceSecurity/">微服务安全：认证与授权体系</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/serviceResilience/">服务容错：熔断、限流与降级</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/distributedTracing/">分布式链路追踪：OpenTelemetry 实践</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/configCenterAndMQ/">微服务配置中心与消息驱动架构</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/apiGateway/">API 网关设计与实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">首页</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/blog/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/blog/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

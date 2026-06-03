@@ -14,7 +14,7 @@
 <meta property="og:description" content="JWT 身份认证实现引言JWT（JSON Web Token）是一种用于身份认证的开放标准，广泛应用于现代 Web 应用中。本文将介绍如何在 Gin 项目中实现 JWT 身份认证，包括 token 生成、验证和中间件实现。 知识点概览1. JWT 结构JWT 由三部分组成，用点号分隔：  Header：声明类型和加密算法 Payload：存储用户信息和过期时间 Signature：对前两部分进行签">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-06-02T07:43:37.000Z">
-<meta property="article:modified_time" content="2026-06-02T08:55:35.855Z">
+<meta property="article:modified_time" content="2026-06-03T02:17:57.001Z">
 <meta property="article:author" content="Go Developer">
 <meta property="article:tag" content="Gin">
 <meta property="article:tag" content="Go">
@@ -120,11 +120,11 @@
 <li><strong>Payload</strong>：存储用户信息和过期时间</li>
 <li><strong>Signature</strong>：对前两部分进行签名</li>
 </ul>
-<h4 id="2-生成-Token"><a href="#2-生成-Token" class="headerlink" title="2. 生成 Token"></a>2. 生成 Token</h4><p>使用 <code>github.com/dgrijalva/jwt-go</code> 库生成 JWT。</p>
+<h4 id="2-生成-Token"><a href="#2-生成-Token" class="headerlink" title="2. 生成 Token"></a>2. 生成 Token</h4><p>使用 <code>github.com/golang-jwt/jwt/v4</code> 库生成 JWT。</p>
 <h4 id="3-验证-Token"><a href="#3-验证-Token" class="headerlink" title="3. 验证 Token"></a>3. 验证 Token</h4><p>解析并验证 JWT 的有效性，包括签名和过期时间。</p>
 <h4 id="4-中间件验证"><a href="#4-中间件验证" class="headerlink" title="4. 中间件验证"></a>4. 中间件验证</h4><p>创建 Gin 中间件，在每个请求中验证 Token。</p>
 <h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>生成 Token</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;github.com/dgrijalva/jwt-go&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> secretKey = []<span class="type">byte</span>(<span class="string">&quot;your-secret-key&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">generateToken</span><span class="params">(userID <span class="type">uint</span>, username <span class="type">string</span>)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    claims := jwt.MapClaims&#123;</span><br><span class="line">        <span class="string">&quot;user_id&quot;</span>:  userID,</span><br><span class="line">        <span class="string">&quot;username&quot;</span>: username,</span><br><span class="line">        <span class="string">&quot;exp&quot;</span>:      time.Now().Add(time.Hour * <span class="number">24</span>).Unix(),</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)</span><br><span class="line">    <span class="keyword">return</span> token.SignedString(secretKey)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;github.com/golang-jwt/jwt/v4&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> secretKey = []<span class="type">byte</span>(<span class="string">&quot;your-secret-key&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">generateToken</span><span class="params">(userID <span class="type">uint</span>, username <span class="type">string</span>)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    claims := jwt.MapClaims&#123;</span><br><span class="line">        <span class="string">&quot;user_id&quot;</span>:  userID,</span><br><span class="line">        <span class="string">&quot;username&quot;</span>: username,</span><br><span class="line">        <span class="string">&quot;exp&quot;</span>:      time.Now().Add(time.Hour * <span class="number">24</span>).Unix(),</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)</span><br><span class="line">    <span class="keyword">return</span> token.SignedString(secretKey)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong>验证 Token</strong>：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">validateToken</span><span class="params">(tokenString <span class="type">string</span>)</span></span> (*jwt.Token, <span class="type">error</span>) &#123;</span><br><span class="line">    token, err := jwt.Parse(tokenString, <span class="function"><span class="keyword">func</span><span class="params">(token *jwt.Token)</span></span> (<span class="keyword">interface</span>&#123;&#125;, <span class="type">error</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;unexpected signing method: %v&quot;</span>, token.Header[<span class="string">&quot;alg&quot;</span>])</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> secretKey, <span class="literal">nil</span></span><br><span class="line">    &#125;)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> !token.Valid &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">&quot;invalid token&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> token, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -145,7 +145,7 @@
 
 <h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了 JWT 身份认证的完整实现：</p>
 <ul>
-<li>使用 jwt-go 库生成和验证 Token</li>
+<li>使用 golang-jwt 库生成和验证 Token</li>
 <li>创建 JWT 中间件保护路由</li>
 <li>实现 Token 刷新机制</li>
 <li>将用户信息存入 Gin context</li>
@@ -196,7 +196,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">分类</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">10</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a><span class="category-list-count">9</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/DevOps/">DevOps</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a><span class="category-list-count">1</span></li></ul></li></ul>
     </div>
   </div>
 
@@ -206,7 +206,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/blog/tags/Gin/" style="font-size: 10px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 10px;">Go</a> <a href="/blog/tags/Web/" style="font-size: 10px;">Web</a>
+      <a href="/blog/tags/API-%E7%BD%91%E5%85%B3/" style="font-size: 10px;">API 网关</a> <a href="/blog/tags/Consul/" style="font-size: 10px;">Consul</a> <a href="/blog/tags/DevOps/" style="font-size: 10px;">DevOps</a> <a href="/blog/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/blog/tags/Gin/" style="font-size: 16.67px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 20px;">Go</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/Jaeger/" style="font-size: 10px;">Jaeger</a> <a href="/blog/tags/Kubernetes/" style="font-size: 10px;">Kubernetes</a> <a href="/blog/tags/OAuth2/" style="font-size: 10px;">OAuth2</a> <a href="/blog/tags/OpenTelemetry/" style="font-size: 10px;">OpenTelemetry</a> <a href="/blog/tags/RESTful/" style="font-size: 10px;">RESTful</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Web/" style="font-size: 16.67px;">Web</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/%E5%AE%89%E5%85%A8/" style="font-size: 10px;">安全</a> <a href="/blog/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" style="font-size: 10px;">工程化</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/" style="font-size: 10px;">服务发现</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">架构设计</a> <a href="/blog/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" style="font-size: 10px;">消息队列</a> <a href="/blog/tags/%E7%86%94%E6%96%AD/" style="font-size: 10px;">熔断</a> <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 10px;">负载均衡</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" style="font-size: 10px;">配置中心</a> <a href="/blog/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" style="font-size: 10px;">链路追踪</a> <a href="/blog/tags/%E9%99%8D%E7%BA%A7/" style="font-size: 10px;">降级</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a>
     </div>
   </div>
 
@@ -215,7 +215,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/06/">六月 2026</a><span class="archive-list-count">22</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/06/">六月 2026</a><span class="archive-list-count">32</span></li></ul>
     </div>
   </div>
 
@@ -228,27 +228,27 @@
       <ul>
         
           <li>
-            <a href="/blog/2026/06/02/ginCrudApi/">RESTful CRUD API 设计与实现</a>
+            <a href="/blog/2026/06/03/microserviceKubernetes/">微服务容器化部署：Kubernetes 实战</a>
           </li>
         
           <li>
-            <a href="/blog/2026/06/02/ginArticleTag/">文章与标签的多对多关系设计</a>
+            <a href="/blog/2026/06/03/microserviceSecurity/">微服务安全：认证与授权体系</a>
           </li>
         
           <li>
-            <a href="/blog/2026/06/02/ginArticleSearch/">文章列表分页与搜索功能实现</a>
+            <a href="/blog/2026/06/03/serviceResilience/">服务容错：熔断、限流与降级</a>
           </li>
         
           <li>
-            <a href="/blog/2026/06/02/ginBlogSystemDesign/">Gin 博客系统架构设计</a>
+            <a href="/blog/2026/06/03/distributedTracing/">分布式链路追踪：OpenTelemetry 实践</a>
           </li>
         
           <li>
-            <a href="/blog/2026/06/02/ginGormIntegration/">GORM 数据库集成与最佳实践</a>
+            <a href="/blog/2026/06/03/configCenterAndMQ/">微服务配置中心与消息驱动架构</a>
           </li>
         
           <li>
-            <a href="/blog/2026/06/02/ginDockerNginx/">Docker 与 Nginx 部署实战</a>
+            <a href="/blog/2026/06/03/apiGateway/">API 网关设计与实现</a>
           </li>
         
       </ul>

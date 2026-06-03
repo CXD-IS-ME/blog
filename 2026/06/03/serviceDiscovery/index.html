@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>服务注册与发现：Consul 实践 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="服务注册与发现：Consul 实践引言在微服务架构中，服务实例的数量和位置是动态变化的。服务注册与发现机制让服务能够自动感知彼此的存在，无需硬编码 IP 地址。Consul 是 HashiCorp 推出的分布式服务发现和配置管理工具，支持健康检查、KV 存储和多数据中心。 知识点概览1. 服务注册服务启动时向 Consul 注册自身信息（IP、端口、健康检查端点），服务关闭时主动注销。 2. 服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="服务注册与发现：Consul 实践">
+<meta property="og:url" content="https://cxd-is-me.github.io/blog/2026/06/03/serviceDiscovery/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="服务注册与发现：Consul 实践引言在微服务架构中，服务实例的数量和位置是动态变化的。服务注册与发现机制让服务能够自动感知彼此的存在，无需硬编码 IP 地址。Consul 是 HashiCorp 推出的分布式服务发现和配置管理工具，支持健康检查、KV 存储和多数据中心。 知识点概览1. 服务注册服务启动时向 Consul 注册自身信息（IP、端口、健康检查端点），服务关闭时主动注销。 2. 服务">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-03T02:00:03.000Z">
+<meta property="article:modified_time" content="2026-06-03T02:42:52.377Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Consul">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="微服务">
+<meta property="article:tag" content="服务发现">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+  
+  
+  <link rel="stylesheet" href="/blog/css/style.css?v=20260602">
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives">归档</a>
+        
+          <a class="main-nav-link" href="/blog/categories">分类</a>
+        
+          <a class="main-nav-link" href="/blog/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cxd-is-me.github.io/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-serviceDiscovery" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/06/03/serviceDiscovery/" class="article-date">
+  <time class="dt-published" datetime="2026-06-03T02:00:03.000Z" itemprop="datePublished">2026-06-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>►<a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      服务注册与发现：Consul 实践
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="服务注册与发现：Consul-实践"><a href="#服务注册与发现：Consul-实践" class="headerlink" title="服务注册与发现：Consul 实践"></a>服务注册与发现：Consul 实践</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>在微服务架构中，服务实例的数量和位置是动态变化的。服务注册与发现机制让服务能够自动感知彼此的存在，无需硬编码 IP 地址。Consul 是 HashiCorp 推出的分布式服务发现和配置管理工具，支持健康检查、KV 存储和多数据中心。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-服务注册"><a href="#1-服务注册" class="headerlink" title="1. 服务注册"></a>1. 服务注册</h4><p>服务启动时向 Consul 注册自身信息（IP、端口、健康检查端点），服务关闭时主动注销。</p>
+<h4 id="2-服务发现"><a href="#2-服务发现" class="headerlink" title="2. 服务发现"></a>2. 服务发现</h4><p>通过 Consul API 或 DNS 查询可用服务实例列表，支持负载均衡和故障转移。</p>
+<h4 id="3-健康检查"><a href="#3-健康检查" class="headerlink" title="3. 健康检查"></a>3. 健康检查</h4><p>Consul 定期探测服务健康状态，自动摘除不健康的实例，保证调用方只获取可用节点。</p>
+<h4 id="4-KV-配置存储"><a href="#4-KV-配置存储" class="headerlink" title="4. KV 配置存储"></a>4. KV 配置存储</h4><p>Consul 内置 KV 存储，可用于动态配置管理，支持 Watch 机制监听配置变更。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>服务注册与注销</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pkg/consul/registry.go</span></span><br><span class="line"><span class="keyword">package</span> consul</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/hashicorp/consul/api&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Registry <span class="keyword">struct</span> &#123;</span><br><span class="line">    client *api.Client</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewRegistry</span><span class="params">(addr <span class="type">string</span>)</span></span> (*Registry, <span class="type">error</span>) &#123;</span><br><span class="line">    cfg := api.DefaultConfig()</span><br><span class="line">    cfg.Address = addr</span><br><span class="line">    </span><br><span class="line">    client, err := api.NewClient(cfg)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> &amp;Registry&#123;client: client&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Registry)</span></span> Register(svc *ServiceInfo) <span class="type">error</span> &#123;</span><br><span class="line">    registration := &amp;api.AgentServiceRegistration&#123;</span><br><span class="line">        ID:      svc.ID,</span><br><span class="line">        Name:    svc.Name,</span><br><span class="line">        Tags:    svc.Tags,</span><br><span class="line">        Port:    svc.Port,</span><br><span class="line">        Address: svc.Host,</span><br><span class="line">        Check: &amp;api.AgentServiceCheck&#123;</span><br><span class="line">            HTTP:                           fmt.Sprintf(<span class="string">&quot;http://%s:%d/health&quot;</span>, svc.Host, svc.Port),</span><br><span class="line">            Timeout:                        <span class="string">&quot;3s&quot;</span>,</span><br><span class="line">            Interval:                       <span class="string">&quot;10s&quot;</span>,</span><br><span class="line">            DeregisterCriticalServiceAfter: <span class="string">&quot;30s&quot;</span>, <span class="comment">// 30秒后自动注销</span></span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> r.client.Agent().ServiceRegister(registration)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Registry)</span></span> Deregister(serviceID <span class="type">string</span>) <span class="type">error</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> r.client.Agent().ServiceDeregister(serviceID)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>服务发现与负载均衡</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pkg/consul/discovery.go</span></span><br><span class="line"><span class="keyword">package</span> consul</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;math/rand&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/hashicorp/consul/api&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Discovery <span class="keyword">struct</span> &#123;</span><br><span class="line">    client *api.Client</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d *Discovery)</span></span> Discover(serviceName <span class="type">string</span>) ([]*api.ServiceEntry, <span class="type">error</span>) &#123;</span><br><span class="line">    entries, _, err := d.client.Health().Service(serviceName, <span class="string">&quot;&quot;</span>, <span class="literal">true</span>, <span class="literal">nil</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> entries, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 随机负载均衡</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d *Discovery)</span></span> RandomInstance(serviceName <span class="type">string</span>) (*api.ServiceEntry, <span class="type">error</span>) &#123;</span><br><span class="line">    entries, err := d.Discover(serviceName)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(entries) == <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;没有可用的服务实例: %s&quot;</span>, serviceName)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    idx := rand.Intn(<span class="built_in">len</span>(entries))</span><br><span class="line">    <span class="keyword">return</span> entries[idx], <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>集成到服务启动流程</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// cmd/server/main.go</span></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    cfg := config.Load()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建 Consul 注册中心</span></span><br><span class="line">    registry, err := consul.NewRegistry(cfg.Consul.Addr)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatalf(<span class="string">&quot;连接 Consul 失败: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 注册服务</span></span><br><span class="line">    instanceID := fmt.Sprintf(<span class="string">&quot;%s-%s&quot;</span>, cfg.Service.Name, uuid.New().String())</span><br><span class="line">    svcInfo := &amp;consul.ServiceInfo&#123;</span><br><span class="line">        ID:   instanceID,</span><br><span class="line">        Name: cfg.Service.Name,</span><br><span class="line">        Host: cfg.Service.Host,</span><br><span class="line">        Port: cfg.Service.Port,</span><br><span class="line">        Tags: []<span class="type">string</span>&#123;<span class="string">&quot;v1&quot;</span>, <span class="string">&quot;go&quot;</span>&#125;,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := registry.Register(svcInfo); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatalf(<span class="string">&quot;服务注册失败: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 优雅退出时注销</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        quit := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">        signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">        &lt;-quit</span><br><span class="line">        </span><br><span class="line">        log.Println(<span class="string">&quot;正在注销服务...&quot;</span>)</span><br><span class="line">        registry.Deregister(instanceID)</span><br><span class="line">        os.Exit(<span class="number">0</span>)</span><br><span class="line">    &#125;()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 启动 HTTP 服务</span></span><br><span class="line">    r := gin.Default()</span><br><span class="line">    r.GET(<span class="string">&quot;/health&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.JSON(<span class="number">200</span>, gin.H&#123;<span class="string">&quot;status&quot;</span>: <span class="string">&quot;ok&quot;</span>&#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    r.Run(fmt.Sprintf(<span class="string">&quot;:%d&quot;</span>, cfg.Service.Port))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用服务发现进行 gRPC 调用</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pkg/client/grpc_client.go</span></span><br><span class="line"><span class="keyword">package</span> client</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;context&quot;</span></span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc/credentials/insecure&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> GrpcClientFactory <span class="keyword">struct</span> &#123;</span><br><span class="line">    discovery *consul.Discovery</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(f *GrpcClientFactory)</span></span> GetUserClient(ctx context.Context) (userpb.UserServiceClient, *grpc.ClientConn, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="comment">// 通过 Consul 发现用户服务</span></span><br><span class="line">    instance, err := f.discovery.RandomInstance(<span class="string">&quot;user-service&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    addr := fmt.Sprintf(<span class="string">&quot;%s:%d&quot;</span>, instance.Service.Address, instance.Service.Port)</span><br><span class="line">    </span><br><span class="line">    conn, err := grpc.DialContext(ctx, addr,</span><br><span class="line">        grpc.WithTransportCredentials(insecure.NewCredentials()),</span><br><span class="line">        grpc.WithBlock(),</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> userpb.NewUserServiceClient(conn), conn, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Consul KV 配置管理</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pkg/consul/config.go</span></span><br><span class="line"><span class="keyword">package</span> consul</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Registry)</span></span> GetKV(key <span class="type">string</span>) ([]<span class="type">byte</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    kv, _, err := r.client.KV().Get(key, <span class="literal">nil</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> kv == <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;key %s not found&quot;</span>, key)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> kv.Value, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Registry)</span></span> WatchKV(key <span class="type">string</span>, onChange <span class="function"><span class="keyword">func</span><span class="params">([]<span class="type">byte</span>)</span></span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> lastIndex <span class="type">uint64</span></span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">        kv, meta, err := r.client.KV().Get(key, &amp;api.QueryOptions&#123;</span><br><span class="line">            WaitIndex: lastIndex,</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            log.Printf(<span class="string">&quot;Watch KV 错误: %v&quot;</span>, err)</span><br><span class="line">            time.Sleep(time.Second)</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> kv != <span class="literal">nil</span> &amp;&amp; meta.LastIndex != lastIndex &#123;</span><br><span class="line">            lastIndex = meta.LastIndex</span><br><span class="line">            onChange(kv.Value)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant S1 as 用户服务实例1</span><br><span class="line">    participant S2 as 用户服务实例2</span><br><span class="line">    participant C as Consul</span><br><span class="line">    participant O as 订单服务</span><br><span class="line">    </span><br><span class="line">    S1-&gt;&gt;C: 注册 user-service:8081</span><br><span class="line">    S2-&gt;&gt;C: 注册 user-service:8082</span><br><span class="line">    C--&gt;&gt;S1: 健康检查 /health</span><br><span class="line">    C--&gt;&gt;S2: 健康检查 /health</span><br><span class="line">    </span><br><span class="line">    O-&gt;&gt;C: 查询 user-service</span><br><span class="line">    C--&gt;&gt;O: [8081, 8082]</span><br><span class="line">    O-&gt;&gt;S1: 调用 gRPC</span><br><span class="line">    </span><br><span class="line">    Note over S2: 实例2 宕机</span><br><span class="line">    C--&gt;&gt;S2: 健康检查失败</span><br><span class="line">    C--&gt;&gt;C: 摘除实例2</span><br><span class="line">    </span><br><span class="line">    O-&gt;&gt;C: 查询 user-service</span><br><span class="line">    C--&gt;&gt;O: [8081]</span><br><span class="line">    O-&gt;&gt;S1: 调用 gRPC</span><br><span class="line">    </span><br><span class="line">    S1-&gt;&gt;C: 注销服务</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[服务启动] --&gt; B[向 Consul 注册]</span><br><span class="line">    B --&gt; C[定期健康检查]</span><br><span class="line">    C --&gt;|健康| D[保持在线]</span><br><span class="line">    C --&gt;|不健康| E[自动摘除]</span><br><span class="line">    D --&gt; F[服务关闭]</span><br><span class="line">    F --&gt; G[主动注销]</span><br><span class="line">    E --&gt; H[等待恢复或剔除]</span><br><span class="line">    </span><br><span class="line">    style B fill:#9f9,stroke:#333</span><br><span class="line">    style E fill:#f99,stroke:#333</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了基于 Consul 的服务注册与发现实践：</p>
+<ul>
+<li>服务启动时自动注册到 Consul，关闭时主动注销</li>
+<li>Consul 通过健康检查自动摘除不健康实例</li>
+<li>客户端通过 Consul 发现可用服务实例，支持随机负载均衡</li>
+<li>Consul KV 存储可用于动态配置管理</li>
+<li>结合 gRPC 实现服务间动态调用</li>
+</ul>
+<p>服务注册与发现是微服务治理的基础设施，下一篇文章将介绍 API 网关的设计与实现。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/03/serviceDiscovery/" data-id="cuid8EcHfY5OzBBIYXGiBexE2" data-title="服务注册与发现：Consul 实践" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Consul/" rel="tag">Consul</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/" rel="tag">服务发现</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/06/03/apiGateway/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          API 网关设计与实现
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/06/03/microserviceCommunication/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">微服务通信基础：RESTful API 与 gRPC</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">10</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a><span class="category-list-count">9</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/DevOps/">DevOps</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a><span class="category-list-count">1</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/API-%E7%BD%91%E5%85%B3/" style="font-size: 10px;">API 网关</a> <a href="/blog/tags/Consul/" style="font-size: 10px;">Consul</a> <a href="/blog/tags/DevOps/" style="font-size: 10px;">DevOps</a> <a href="/blog/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/blog/tags/Gin/" style="font-size: 16.67px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 20px;">Go</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/Jaeger/" style="font-size: 10px;">Jaeger</a> <a href="/blog/tags/Kubernetes/" style="font-size: 10px;">Kubernetes</a> <a href="/blog/tags/OAuth2/" style="font-size: 10px;">OAuth2</a> <a href="/blog/tags/OpenTelemetry/" style="font-size: 10px;">OpenTelemetry</a> <a href="/blog/tags/RESTful/" style="font-size: 10px;">RESTful</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Web/" style="font-size: 16.67px;">Web</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/%E5%AE%89%E5%85%A8/" style="font-size: 10px;">安全</a> <a href="/blog/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" style="font-size: 10px;">工程化</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/" style="font-size: 10px;">服务发现</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">架构设计</a> <a href="/blog/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" style="font-size: 10px;">消息队列</a> <a href="/blog/tags/%E7%86%94%E6%96%AD/" style="font-size: 10px;">熔断</a> <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 10px;">负载均衡</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" style="font-size: 10px;">配置中心</a> <a href="/blog/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" style="font-size: 10px;">链路追踪</a> <a href="/blog/tags/%E9%99%8D%E7%BA%A7/" style="font-size: 10px;">降级</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/06/">六月 2026</a><span class="archive-list-count">32</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceKubernetes/">微服务容器化部署：Kubernetes 实战</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceSecurity/">微服务安全：认证与授权体系</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/serviceResilience/">服务容错：熔断、限流与降级</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/distributedTracing/">分布式链路追踪：OpenTelemetry 实践</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/configCenterAndMQ/">微服务配置中心与消息驱动架构</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/apiGateway/">API 网关设计与实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">首页</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/blog/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/blog/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

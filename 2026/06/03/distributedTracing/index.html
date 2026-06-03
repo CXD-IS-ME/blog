@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>分布式链路追踪：OpenTelemetry 实践 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="分布式链路追踪：OpenTelemetry 实践引言在微服务架构中，一个用户请求可能经过多个服务。当出现性能瓶颈或异常时，如何快速定位问题？分布式链路追踪通过 TraceID 串联整个调用链，帮助开发者追踪请求路径、分析延迟来源。本文将介绍 OpenTelemetry 在 Go 微服务中的实践。 知识点概览1. OpenTelemetry 核心概念Trace 表示一次完整的请求链路，由多个 Spa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式链路追踪：OpenTelemetry 实践">
+<meta property="og:url" content="https://cxd-is-me.github.io/blog/2026/06/03/distributedTracing/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="分布式链路追踪：OpenTelemetry 实践引言在微服务架构中，一个用户请求可能经过多个服务。当出现性能瓶颈或异常时，如何快速定位问题？分布式链路追踪通过 TraceID 串联整个调用链，帮助开发者追踪请求路径、分析延迟来源。本文将介绍 OpenTelemetry 在 Go 微服务中的实践。 知识点概览1. OpenTelemetry 核心概念Trace 表示一次完整的请求链路，由多个 Spa">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-03T02:00:06.000Z">
+<meta property="article:modified_time" content="2026-06-03T02:42:52.377Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Jaeger">
+<meta property="article:tag" content="OpenTelemetry">
+<meta property="article:tag" content="微服务">
+<meta property="article:tag" content="链路追踪">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+  
+  
+  <link rel="stylesheet" href="/blog/css/style.css?v=20260602">
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives">归档</a>
+        
+          <a class="main-nav-link" href="/blog/categories">分类</a>
+        
+          <a class="main-nav-link" href="/blog/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cxd-is-me.github.io/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-distributedTracing" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/06/03/distributedTracing/" class="article-date">
+  <time class="dt-published" datetime="2026-06-03T02:00:06.000Z" itemprop="datePublished">2026-06-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>►<a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      分布式链路追踪：OpenTelemetry 实践
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="分布式链路追踪：OpenTelemetry-实践"><a href="#分布式链路追踪：OpenTelemetry-实践" class="headerlink" title="分布式链路追踪：OpenTelemetry 实践"></a>分布式链路追踪：OpenTelemetry 实践</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>在微服务架构中，一个用户请求可能经过多个服务。当出现性能瓶颈或异常时，如何快速定位问题？分布式链路追踪通过 TraceID 串联整个调用链，帮助开发者追踪请求路径、分析延迟来源。本文将介绍 OpenTelemetry 在 Go 微服务中的实践。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-OpenTelemetry-核心概念"><a href="#1-OpenTelemetry-核心概念" class="headerlink" title="1. OpenTelemetry 核心概念"></a>1. OpenTelemetry 核心概念</h4><p>Trace 表示一次完整的请求链路，由多个 Span 组成。每个 Span 代表一个独立的操作单元，包含开始时间、持续时间、标签和事件。</p>
+<h4 id="2-TraceID-传播机制"><a href="#2-TraceID-传播机制" class="headerlink" title="2. TraceID 传播机制"></a>2. TraceID 传播机制</h4><p>通过 HTTP Header 或 gRPC Metadata 在服务间传递 TraceID 和 SpanID，确保整个调用链被串联。</p>
+<h4 id="3-自动埋点与手动埋点"><a href="#3-自动埋点与手动埋点" class="headerlink" title="3. 自动埋点与手动埋点"></a>3. 自动埋点与手动埋点</h4><p>HTTP&#x2F;gRPC 框架级自动埋点覆盖常见通信场景，手动埋点用于关键业务逻辑的精细化追踪。</p>
+<h4 id="4-Jaeger-集成部署"><a href="#4-Jaeger-集成部署" class="headerlink" title="4. Jaeger 集成部署"></a>4. Jaeger 集成部署</h4><p>使用 Jaeger 作为后端存储和可视化平台，接收、存储并展示链路追踪数据。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>初始化 OpenTelemetry</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pkg/telemetry/tracer.go</span></span><br><span class="line"><span class="keyword">package</span> telemetry</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;context&quot;</span></span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel&quot;</span></span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel/exporters/jaeger&quot;</span></span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel/sdk/resource&quot;</span></span><br><span class="line">    sdktrace <span class="string">&quot;go.opentelemetry.io/otel/sdk/trace&quot;</span></span><br><span class="line">    semconv <span class="string">&quot;go.opentelemetry.io/otel/semconv/v1.17.0&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">InitTracer</span><span class="params">(serviceName, jaegerEndpoint <span class="type">string</span>)</span></span> (*sdktrace.TracerProvider, <span class="type">error</span>) &#123;</span><br><span class="line">    <span class="comment">// 创建 Jaeger 导出器</span></span><br><span class="line">    exporter, err := jaeger.New(</span><br><span class="line">        jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(jaegerEndpoint)),</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建 TracerProvider</span></span><br><span class="line">    tp := sdktrace.NewTracerProvider(</span><br><span class="line">        sdktrace.WithBatcher(exporter),</span><br><span class="line">        sdktrace.WithResource(resource.NewWithAttributes(</span><br><span class="line">            semconv.SchemaURL,</span><br><span class="line">            semconv.ServiceName(serviceName),</span><br><span class="line">        )),</span><br><span class="line">        <span class="comment">// 采样策略：全量采样（生产环境建议按比例）</span></span><br><span class="line">        sdktrace.WithSampler(sdktrace.AlwaysSample()),</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    otel.SetTracerProvider(tp)</span><br><span class="line">    <span class="keyword">return</span> tp, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Gin 中间件自动埋点</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pkg/middleware/tracing.go</span></span><br><span class="line"><span class="keyword">package</span> middleware</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel&quot;</span></span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel/propagation&quot;</span></span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel/trace&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TracingMiddleware</span><span class="params">(serviceName <span class="type">string</span>)</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    tracer := otel.Tracer(serviceName)</span><br><span class="line">    propagator := propagation.TraceContext&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        <span class="comment">// 从请求头中提取 TraceContext</span></span><br><span class="line">        ctx := propagator.Extract(c.Request.Context(), propagation.HeaderCarrier(c.Request.Header))</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 创建 Span</span></span><br><span class="line">        spanName := fmt.Sprintf(<span class="string">&quot;%s %s&quot;</span>, c.Request.Method, c.FullPath())</span><br><span class="line">        ctx, span := tracer.Start(ctx, spanName,</span><br><span class="line">            trace.WithSpanKind(trace.SpanKindServer),</span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">defer</span> span.End()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置 Span 属性</span></span><br><span class="line">        span.SetAttributes(</span><br><span class="line">            semconv.HTTPMethodKey.String(c.Request.Method),</span><br><span class="line">            semconv.HTTPURLKey.String(c.Request.URL.String()),</span><br><span class="line">            semconv.HTTPStatusCodeKey.Int(c.Writer.Status()),</span><br><span class="line">        )</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 将 ctx 注入到 gin.Context</span></span><br><span class="line">        c.Request = c.Request.WithContext(ctx)</span><br><span class="line">        </span><br><span class="line">        c.Next()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 记录响应状态码</span></span><br><span class="line">        span.SetAttributes(semconv.HTTPStatusCodeKey.Int(c.Writer.Status()))</span><br><span class="line">        <span class="keyword">if</span> c.Writer.Status() &gt;= <span class="number">400</span> &#123;</span><br><span class="line">            span.SetStatus(codes.Error, <span class="string">&quot;请求失败&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>gRPC 拦截器自动埋点</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pkg/middleware/grpc_tracing.go</span></span><br><span class="line"><span class="keyword">package</span> middleware</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel&quot;</span></span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel/propagation&quot;</span></span><br><span class="line">    <span class="string">&quot;go.opentelemetry.io/otel/trace&quot;</span></span><br><span class="line">    <span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GrpcClientTracingInterceptor</span><span class="params">()</span></span> grpc.UnaryClientInterceptor &#123;</span><br><span class="line">    tracer := otel.Tracer(<span class="string">&quot;grpc-client&quot;</span>)</span><br><span class="line">    propagator := propagation.TraceContext&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, method <span class="type">string</span>, req, reply <span class="keyword">interface</span>&#123;&#125;, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">        ctx, span := tracer.Start(ctx, <span class="string">&quot;grpc:&quot;</span>+method,</span><br><span class="line">            trace.WithSpanKind(trace.SpanKindClient),</span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">defer</span> span.End()</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 将 TraceContext 注入到 gRPC Metadata</span></span><br><span class="line">        md := metadata.New(<span class="literal">nil</span>)</span><br><span class="line">        propagator.Inject(ctx, propagation.HeaderCarrier(md))</span><br><span class="line">        ctx = metadata.NewOutgoingContext(ctx, md)</span><br><span class="line">        </span><br><span class="line">        err := invoker(ctx, method, req, reply, cc, opts...)</span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            span.RecordError(err)</span><br><span class="line">            span.SetStatus(codes.Error, err.Error())</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GrpcServerTracingInterceptor</span><span class="params">()</span></span> grpc.UnaryServerInterceptor &#123;</span><br><span class="line">    tracer := otel.Tracer(<span class="string">&quot;grpc-server&quot;</span>)</span><br><span class="line">    propagator := propagation.TraceContext&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, req <span class="keyword">interface</span>&#123;&#125;, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler)</span></span> (<span class="keyword">interface</span>&#123;&#125;, <span class="type">error</span>) &#123;</span><br><span class="line">        <span class="comment">// 从 gRPC Metadata 中提取 TraceContext</span></span><br><span class="line">        md, _ := metadata.FromIncomingContext(ctx)</span><br><span class="line">        ctx = propagator.Extract(ctx, propagation.HeaderCarrier(md))</span><br><span class="line">        </span><br><span class="line">        ctx, span := tracer.Start(ctx, <span class="string">&quot;grpc:&quot;</span>+info.FullMethod,</span><br><span class="line">            trace.WithSpanKind(trace.SpanKindServer),</span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">defer</span> span.End()</span><br><span class="line">        </span><br><span class="line">        resp, err := handler(ctx, req)</span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            span.RecordError(err)</span><br><span class="line">            span.SetStatus(codes.Error, err.Error())</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> resp, err</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>业务代码手动埋点</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// internal/service/order_service.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *OrderService)</span></span> CreateOrder(ctx context.Context, req *CreateOrderReq) (*Order, <span class="type">error</span>) &#123;</span><br><span class="line">    tracer := otel.Tracer(<span class="string">&quot;order-service&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 手动创建子 Span 追踪关键业务逻辑</span></span><br><span class="line">    ctx, span := tracer.Start(ctx, <span class="string">&quot;OrderService.CreateOrder&quot;</span>)</span><br><span class="line">    <span class="keyword">defer</span> span.End()</span><br><span class="line">    </span><br><span class="line">    span.SetAttributes(</span><br><span class="line">        attribute.String(<span class="string">&quot;user.id&quot;</span>, req.UserID),</span><br><span class="line">        attribute.Float64(<span class="string">&quot;order.amount&quot;</span>, req.Amount),</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 查询库存（子 Span）</span></span><br><span class="line">    ctx, stockSpan := tracer.Start(ctx, <span class="string">&quot;checkStock&quot;</span>)</span><br><span class="line">    stock, err := s.checkStock(ctx, req.ProductID)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        stockSpan.RecordError(err)</span><br><span class="line">        stockSpan.End()</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    stockSpan.SetAttributes(attribute.Int(<span class="string">&quot;stock.available&quot;</span>, stock))</span><br><span class="line">    stockSpan.End()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建订单（子 Span）</span></span><br><span class="line">    ctx, saveSpan := tracer.Start(ctx, <span class="string">&quot;saveOrder&quot;</span>)</span><br><span class="line">    <span class="keyword">defer</span> saveSpan.End()</span><br><span class="line">    </span><br><span class="line">    order := &amp;Order&#123;UserID: req.UserID, Amount: req.Amount&#125;</span><br><span class="line">    <span class="keyword">if</span> err := s.repo.Create(ctx, order); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        saveSpan.RecordError(err)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    saveSpan.SetAttributes(attribute.String(<span class="string">&quot;order.id&quot;</span>, order.ID))</span><br><span class="line">    <span class="keyword">return</span> order, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>主程序集成</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// cmd/server/main.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 初始化 OpenTelemetry</span></span><br><span class="line">    tp, err := telemetry.InitTracer(<span class="string">&quot;user-service&quot;</span>, <span class="string">&quot;http://localhost:14268/api/traces&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatalf(<span class="string">&quot;初始化 Tracer 失败: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> tp.Shutdown(context.Background())</span><br><span class="line">    </span><br><span class="line">    r := gin.Default()</span><br><span class="line">    r.Use(middleware.TracingMiddleware(<span class="string">&quot;user-service&quot;</span>))</span><br><span class="line">    </span><br><span class="line">    r.Run(<span class="string">&quot;:8081&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant A as 客户端</span><br><span class="line">    participant B as API 网关</span><br><span class="line">    participant C as 订单服务</span><br><span class="line">    participant D as 用户服务</span><br><span class="line">    participant E as 库存服务</span><br><span class="line">    participant J as Jaeger</span><br><span class="line">    </span><br><span class="line">    A-&gt;&gt;B: HTTP 请求</span><br><span class="line">    B-&gt;&gt;B: 生成 TraceID</span><br><span class="line">    B-&gt;&gt;C: gRPC + TraceID</span><br><span class="line">    C-&gt;&gt;D: gRPC + TraceID</span><br><span class="line">    C-&gt;&gt;E: gRPC + TraceID</span><br><span class="line">    </span><br><span class="line">    B-&gt;&gt;J: 上报 Span</span><br><span class="line">    C-&gt;&gt;J: 上报 Span</span><br><span class="line">    D-&gt;&gt;J: 上报 Span</span><br><span class="line">    E-&gt;&gt;J: 上报 Span</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[Trace] --&gt; B[Span: API 网关]</span><br><span class="line">    B --&gt; C[Span: 订单服务]</span><br><span class="line">    B --&gt; D[Span: 用户服务]</span><br><span class="line">    C --&gt; E[Span: 查询库存]</span><br><span class="line">    C --&gt; F[Span: 保存订单]</span><br><span class="line">    C --&gt; G[Span: 发送通知]</span><br><span class="line">    </span><br><span class="line">    style B fill:#9cf,stroke:#333</span><br><span class="line">    style C fill:#9f9,stroke:#333</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了分布式链路追踪的实践：</p>
+<ul>
+<li>OpenTelemetry 提供统一的追踪标准，Trace 由多个 Span 组成</li>
+<li>TraceID 通过 HTTP Header 和 gRPC Metadata 在服务间传播</li>
+<li>框架级中间件实现自动埋点，关键业务逻辑手动埋点</li>
+<li>Jaeger 作为后端存储和可视化平台，支持查询和分析</li>
+</ul>
+<p>分布式链路追踪是微服务可观测性的核心组件，下一篇文章将介绍服务容错机制。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/03/distributedTracing/" data-id="cuidWf5OfGNSC2qS-7ITGWL_i" data-title="分布式链路追踪：OpenTelemetry 实践" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Jaeger/" rel="tag">Jaeger</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/OpenTelemetry/" rel="tag">OpenTelemetry</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" rel="tag">链路追踪</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2026/06/03/serviceResilience/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          服务容错：熔断、限流与降级
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2026/06/03/configCenterAndMQ/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">微服务配置中心与消息驱动架构</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">10</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a><span class="category-list-count">9</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/DevOps/">DevOps</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a><span class="category-list-count">1</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/API-%E7%BD%91%E5%85%B3/" style="font-size: 10px;">API 网关</a> <a href="/blog/tags/Consul/" style="font-size: 10px;">Consul</a> <a href="/blog/tags/DevOps/" style="font-size: 10px;">DevOps</a> <a href="/blog/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/blog/tags/Gin/" style="font-size: 16.67px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 20px;">Go</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/Jaeger/" style="font-size: 10px;">Jaeger</a> <a href="/blog/tags/Kubernetes/" style="font-size: 10px;">Kubernetes</a> <a href="/blog/tags/OAuth2/" style="font-size: 10px;">OAuth2</a> <a href="/blog/tags/OpenTelemetry/" style="font-size: 10px;">OpenTelemetry</a> <a href="/blog/tags/RESTful/" style="font-size: 10px;">RESTful</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Web/" style="font-size: 16.67px;">Web</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/%E5%AE%89%E5%85%A8/" style="font-size: 10px;">安全</a> <a href="/blog/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" style="font-size: 10px;">工程化</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/" style="font-size: 10px;">服务发现</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">架构设计</a> <a href="/blog/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" style="font-size: 10px;">消息队列</a> <a href="/blog/tags/%E7%86%94%E6%96%AD/" style="font-size: 10px;">熔断</a> <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 10px;">负载均衡</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" style="font-size: 10px;">配置中心</a> <a href="/blog/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" style="font-size: 10px;">链路追踪</a> <a href="/blog/tags/%E9%99%8D%E7%BA%A7/" style="font-size: 10px;">降级</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/06/">六月 2026</a><span class="archive-list-count">32</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceKubernetes/">微服务容器化部署：Kubernetes 实战</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceSecurity/">微服务安全：认证与授权体系</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/serviceResilience/">服务容错：熔断、限流与降级</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/distributedTracing/">分布式链路追踪：OpenTelemetry 实践</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/configCenterAndMQ/">微服务配置中心与消息驱动架构</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/apiGateway/">API 网关设计与实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">首页</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/blog/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/blog/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

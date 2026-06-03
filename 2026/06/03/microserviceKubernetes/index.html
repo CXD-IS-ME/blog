@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>微服务容器化部署：Kubernetes 实战 | Go Tech Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="微服务容器化部署：Kubernetes 实战引言微服务架构带来了部署运维的复杂性。Docker 容器化提供了标准化的运行环境，Kubernetes 则提供了编排、伸缩、服务发现、滚动更新等能力。本文将介绍如何将 Go 微服务容器化并部署到 Kubernetes 集群。 知识点概览1. Dockerfile 最佳实践多阶段构建减小镜像体积，使用非 root 用户运行，健康检查探针配置。 2. Kub">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微服务容器化部署：Kubernetes 实战">
+<meta property="og:url" content="https://cxd-is-me.github.io/blog/2026/06/03/microserviceKubernetes/index.html">
+<meta property="og:site_name" content="Go Tech Blog">
+<meta property="og:description" content="微服务容器化部署：Kubernetes 实战引言微服务架构带来了部署运维的复杂性。Docker 容器化提供了标准化的运行环境，Kubernetes 则提供了编排、伸缩、服务发现、滚动更新等能力。本文将介绍如何将 Go 微服务容器化并部署到 Kubernetes 集群。 知识点概览1. Dockerfile 最佳实践多阶段构建减小镜像体积，使用非 root 用户运行，健康检查探针配置。 2. Kub">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-03T02:00:09.000Z">
+<meta property="article:modified_time" content="2026-06-03T02:42:52.369Z">
+<meta property="article:author" content="Go Developer">
+<meta property="article:tag" content="DevOps">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="微服务">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Go Tech Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+  
+  
+  <link rel="stylesheet" href="/blog/css/style.css?v=20260602">
+  
+    
+<link rel="stylesheet" href="/blog/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">Go Tech Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">Go Developer</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/blog/">首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives">归档</a>
+        
+          <a class="main-nav-link" href="/blog/categories">分类</a>
+        
+          <a class="main-nav-link" href="/blog/tags">标签</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://github.com"><span class="fa fa-github"></span></a>
+          
+            <a class="nav-icon" target="_blank" rel="noopener" href="https://twitter.com"><span class="fa fa-twitter"></span></a>
+          
+        
+        
+          <a class="nav-icon" href="/blog/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cxd-is-me.github.io/blog"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-microserviceKubernetes" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/blog/2026/06/03/microserviceKubernetes/" class="article-date">
+  <time class="dt-published" datetime="2026-06-03T02:00:09.000Z" itemprop="datePublished">2026-06-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>►<a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a>►<a class="article-category-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/DevOps/">DevOps</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      微服务容器化部署：Kubernetes 实战
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="微服务容器化部署：Kubernetes-实战"><a href="#微服务容器化部署：Kubernetes-实战" class="headerlink" title="微服务容器化部署：Kubernetes 实战"></a>微服务容器化部署：Kubernetes 实战</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>微服务架构带来了部署运维的复杂性。Docker 容器化提供了标准化的运行环境，Kubernetes 则提供了编排、伸缩、服务发现、滚动更新等能力。本文将介绍如何将 Go 微服务容器化并部署到 Kubernetes 集群。</p>
+<h3 id="知识点概览"><a href="#知识点概览" class="headerlink" title="知识点概览"></a>知识点概览</h3><h4 id="1-Dockerfile-最佳实践"><a href="#1-Dockerfile-最佳实践" class="headerlink" title="1. Dockerfile 最佳实践"></a>1. Dockerfile 最佳实践</h4><p>多阶段构建减小镜像体积，使用非 root 用户运行，健康检查探针配置。</p>
+<h4 id="2-Kubernetes-核心资源"><a href="#2-Kubernetes-核心资源" class="headerlink" title="2. Kubernetes 核心资源"></a>2. Kubernetes 核心资源</h4><p>Deployment 管理无状态服务，Service 提供负载均衡，ConfigMap 管理配置，Secret 管理敏感信息。</p>
+<h4 id="3-服务发现与负载均衡"><a href="#3-服务发现与负载均衡" class="headerlink" title="3. 服务发现与负载均衡"></a>3. 服务发现与负载均衡</h4><p>Kubernetes Service 内置 DNS 解析和负载均衡，替代 Consul 等外部注册中心。</p>
+<h4 id="4-滚动更新与自动伸缩"><a href="#4-滚动更新与自动伸缩" class="headerlink" title="4. 滚动更新与自动伸缩"></a>4. 滚动更新与自动伸缩</h4><p>RollingUpdate 策略实现零停机部署，HPA 根据 CPU&#x2F;内存自动伸缩副本数。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p><strong>多阶段 Dockerfile</strong>：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Dockerfile</span></span><br><span class="line"><span class="comment"># 第一阶段：构建</span></span><br><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.22</span>-alpine AS builder</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> go.mod go.sum ./</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> go mod download</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> . .</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> CGO_ENABLED=0 GOOS=linux go build -ldflags=<span class="string">&quot;-s -w&quot;</span> -o /app/server ./cmd/server</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二阶段：运行</span></span><br><span class="line"><span class="keyword">FROM</span> alpine:<span class="number">3.19</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apk add --no-cache ca-certificates tzdata</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> adduser -D -g <span class="string">&#x27;&#x27;</span> appuser</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder /app/server .</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder /app/config ./config</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> appuser</span><br><span class="line"></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">HEALTHCHECK</span><span class="language-bash"> --interval=10s --<span class="built_in">timeout</span>=3s --retries=3 \</span></span><br><span class="line"><span class="language-bash">    CMD wget -qO- http://localhost:8080/health || <span class="built_in">exit</span> 1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="string">&quot;./server&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Kubernetes Deployment</strong>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># deploy/user-service.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">user-service</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">user-service</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">3</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">user-service</span></span><br><span class="line">  <span class="attr">strategy:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">RollingUpdate</span></span><br><span class="line">    <span class="attr">rollingUpdate:</span></span><br><span class="line">      <span class="attr">maxSurge:</span> <span class="number">1</span></span><br><span class="line">      <span class="attr">maxUnavailable:</span> <span class="number">0</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">user-service</span></span><br><span class="line">        <span class="attr">version:</span> <span class="string">v1</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">user-service</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">registry.example.com/user-service:latest</span></span><br><span class="line">          <span class="attr">ports:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">8080</span></span><br><span class="line">              <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">9080</span></span><br><span class="line">              <span class="attr">name:</span> <span class="string">grpc</span></span><br><span class="line">          <span class="attr">envFrom:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">configMapRef:</span></span><br><span class="line">                <span class="attr">name:</span> <span class="string">user-service-config</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">secretRef:</span></span><br><span class="line">                <span class="attr">name:</span> <span class="string">user-service-secret</span></span><br><span class="line">          <span class="attr">resources:</span></span><br><span class="line">            <span class="attr">requests:</span></span><br><span class="line">              <span class="attr">cpu:</span> <span class="string">100m</span></span><br><span class="line">              <span class="attr">memory:</span> <span class="string">128Mi</span></span><br><span class="line">            <span class="attr">limits:</span></span><br><span class="line">              <span class="attr">cpu:</span> <span class="string">500m</span></span><br><span class="line">              <span class="attr">memory:</span> <span class="string">256Mi</span></span><br><span class="line">          <span class="attr">livenessProbe:</span></span><br><span class="line">            <span class="attr">httpGet:</span></span><br><span class="line">              <span class="attr">path:</span> <span class="string">/health</span></span><br><span class="line">              <span class="attr">port:</span> <span class="string">http</span></span><br><span class="line">            <span class="attr">initialDelaySeconds:</span> <span class="number">10</span></span><br><span class="line">            <span class="attr">periodSeconds:</span> <span class="number">10</span></span><br><span class="line">          <span class="attr">readinessProbe:</span></span><br><span class="line">            <span class="attr">httpGet:</span></span><br><span class="line">              <span class="attr">path:</span> <span class="string">/ready</span></span><br><span class="line">              <span class="attr">port:</span> <span class="string">http</span></span><br><span class="line">            <span class="attr">initialDelaySeconds:</span> <span class="number">5</span></span><br><span class="line">            <span class="attr">periodSeconds:</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Kubernetes Service</strong>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># deploy/user-service-svc.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">user-service</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">user-service</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">      <span class="attr">targetPort:</span> <span class="string">http</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">grpc</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">9080</span></span><br><span class="line">      <span class="attr">targetPort:</span> <span class="string">grpc</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">user-service-external</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">NodePort</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">user-service</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">      <span class="attr">targetPort:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">nodePort:</span> <span class="number">30080</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>ConfigMap 配置管理</strong>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># deploy/user-service-config.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">user-service-config</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">config.yaml:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    server:</span></span><br><span class="line"><span class="string">      port: 8080</span></span><br><span class="line"><span class="string">      mode: release</span></span><br><span class="line"><span class="string">    database:</span></span><br><span class="line"><span class="string">      host: mysql-service</span></span><br><span class="line"><span class="string">      port: 3306</span></span><br><span class="line"><span class="string">      dbname: user_db</span></span><br><span class="line"><span class="string">    redis:</span></span><br><span class="line"><span class="string">      host: redis-service</span></span><br><span class="line"><span class="string">      port: 6379</span></span><br><span class="line"><span class="string">    consul:</span></span><br><span class="line"><span class="string">      addr: consul-service:8500</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Secret 敏感信息管理</strong>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># deploy/user-service-secret.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">user-service-secret</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br><span class="line"><span class="attr">stringData:</span></span><br><span class="line">  <span class="attr">DATABASE_USER:</span> <span class="string">&quot;root&quot;</span></span><br><span class="line">  <span class="attr">DATABASE_PASSWORD:</span> <span class="string">&quot;your-secure-password&quot;</span></span><br><span class="line">  <span class="attr">JWT_SECRET:</span> <span class="string">&quot;your-jwt-secret-key&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>HPA 自动伸缩</strong>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># deploy/user-service-hpa.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">autoscaling/v2</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">HorizontalPodAutoscaler</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">user-service-hpa</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">scaleTargetRef:</span></span><br><span class="line">    <span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line">    <span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">user-service</span></span><br><span class="line">  <span class="attr">minReplicas:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">maxReplicas:</span> <span class="number">10</span></span><br><span class="line">  <span class="attr">metrics:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">Resource</span></span><br><span class="line">      <span class="attr">resource:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">cpu</span></span><br><span class="line">        <span class="attr">target:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">Utilization</span></span><br><span class="line">          <span class="attr">averageUtilization:</span> <span class="number">70</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">Resource</span></span><br><span class="line">      <span class="attr">resource:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">memory</span></span><br><span class="line">        <span class="attr">target:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">Utilization</span></span><br><span class="line">          <span class="attr">averageUtilization:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Ingress 网关路由</strong>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># deploy/ingress.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Ingress</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">api-gateway-ingress</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">nginx.ingress.kubernetes.io/rewrite-target:</span> <span class="string">/$2</span></span><br><span class="line">    <span class="attr">nginx.ingress.kubernetes.io/limit-rps:</span> <span class="string">&quot;100&quot;</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">ingressClassName:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">rules:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">api.example.com</span></span><br><span class="line">      <span class="attr">http:</span></span><br><span class="line">        <span class="attr">paths:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/users(/|$)(.*)</span></span><br><span class="line">            <span class="attr">pathType:</span> <span class="string">ImplementationSpecific</span></span><br><span class="line">            <span class="attr">backend:</span></span><br><span class="line">              <span class="attr">service:</span></span><br><span class="line">                <span class="attr">name:</span> <span class="string">user-service</span></span><br><span class="line">                <span class="attr">port:</span></span><br><span class="line">                  <span class="attr">number:</span> <span class="number">8080</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/orders(/|$)(.*)</span></span><br><span class="line">            <span class="attr">pathType:</span> <span class="string">ImplementationSpecific</span></span><br><span class="line">            <span class="attr">backend:</span></span><br><span class="line">              <span class="attr">service:</span></span><br><span class="line">                <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">                <span class="attr">port:</span></span><br><span class="line">                  <span class="attr">number:</span> <span class="number">8080</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Go 程序读取 Kubernetes 环境</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// main.go 中适配 Kubernetes 环境</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 优先从环境变量读取配置（Kubernetes ConfigMap/Secret 注入）</span></span><br><span class="line">    dbHost := getEnv(<span class="string">&quot;DATABASE_HOST&quot;</span>, <span class="string">&quot;localhost&quot;</span>)</span><br><span class="line">    dbUser := getEnv(<span class="string">&quot;DATABASE_USER&quot;</span>, <span class="string">&quot;root&quot;</span>)</span><br><span class="line">    dbPassword := getEnv(<span class="string">&quot;DATABASE_PASSWORD&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    cfg := &amp;config.Config&#123;</span><br><span class="line">        Database: config.DatabaseConfig&#123;</span><br><span class="line">            Host:     dbHost,</span><br><span class="line">            User:     dbUser,</span><br><span class="line">            Password: dbPassword,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 优雅关闭：响应 SIGTERM（Kubernetes 终止 Pod 时发送）</span></span><br><span class="line">    srv := &amp;http.Server&#123;Addr: <span class="string">&quot;:8080&quot;</span>, Handler: router&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> err := srv.ListenAndServe(); err != <span class="literal">nil</span> &amp;&amp; err != http.ErrServerClosed &#123;</span><br><span class="line">            log.Fatalf(<span class="string">&quot;服务启动失败: %v&quot;</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">    </span><br><span class="line">    quit := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">    &lt;-quit</span><br><span class="line">    </span><br><span class="line">    log.Println(<span class="string">&quot;正在优雅关闭服务...&quot;</span>)</span><br><span class="line">    ctx, cancel := context.WithTimeout(context.Background(), <span class="number">30</span>*time.Second)</span><br><span class="line">    <span class="keyword">defer</span> cancel()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> err := srv.Shutdown(ctx); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatalf(<span class="string">&quot;服务关闭异常: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    log.Println(<span class="string">&quot;服务已关闭&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">getEnv</span><span class="params">(key, defaultVal <span class="type">string</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> val := os.Getenv(key); val != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> val</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> defaultVal</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>一键部署脚本</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># deploy.sh - 一键部署所有微服务到 Kubernetes</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> -e</span><br><span class="line"></span><br><span class="line">NAMESPACE=<span class="string">&quot;microservices&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建命名空间</span></span><br><span class="line">kubectl create namespace <span class="variable">$&#123;NAMESPACE&#125;</span> --dry-run=client -o yaml | kubectl apply -f -</span><br><span class="line"></span><br><span class="line"><span class="comment"># 部署 ConfigMap 和 Secret</span></span><br><span class="line">kubectl apply -f deploy/user-service-config.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line">kubectl apply -f deploy/user-service-secret.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 部署数据库</span></span><br><span class="line">kubectl apply -f deploy/mysql.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line">kubectl apply -f deploy/redis.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 等待数据库就绪</span></span><br><span class="line">kubectl <span class="built_in">wait</span> --<span class="keyword">for</span>=condition=ready pod -l app=mysql -n <span class="variable">$&#123;NAMESPACE&#125;</span> --<span class="built_in">timeout</span>=120s</span><br><span class="line">kubectl <span class="built_in">wait</span> --<span class="keyword">for</span>=condition=ready pod -l app=redis -n <span class="variable">$&#123;NAMESPACE&#125;</span> --<span class="built_in">timeout</span>=120s</span><br><span class="line"></span><br><span class="line"><span class="comment"># 部署微服务</span></span><br><span class="line"><span class="keyword">for</span> svc <span class="keyword">in</span> user-service order-service product-service api-gateway; <span class="keyword">do</span></span><br><span class="line">    kubectl apply -f deploy/<span class="variable">$&#123;svc&#125;</span>.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line">    kubectl apply -f deploy/<span class="variable">$&#123;svc&#125;</span>-svc.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 部署 HPA</span></span><br><span class="line">kubectl apply -f deploy/user-service-hpa.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 部署 Ingress</span></span><br><span class="line">kubectl apply -f deploy/ingress.yaml -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;部署完成！&quot;</span></span><br><span class="line">kubectl get pods -n <span class="variable">$&#123;NAMESPACE&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="配图说明"><a href="#配图说明" class="headerlink" title="配图说明"></a>配图说明</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    subgraph Kubernetes 集群</span><br><span class="line">        A[Ingress Controller] --&gt; B[API 网关 Service]</span><br><span class="line">        B --&gt; C[用户服务 Pod]</span><br><span class="line">        B --&gt; D[订单服务 Pod]</span><br><span class="line">        B --&gt; E[商品服务 Pod]</span><br><span class="line">        </span><br><span class="line">        C --&gt; F[用户服务 Service]</span><br><span class="line">        D --&gt; G[订单服务 Service]</span><br><span class="line">        E --&gt; H[商品服务 Service]</span><br><span class="line">        </span><br><span class="line">        F --&gt; C1[Pod 1]</span><br><span class="line">        F --&gt; C2[Pod 2]</span><br><span class="line">        F --&gt; C3[Pod 3]</span><br><span class="line">        </span><br><span class="line">        I[ConfigMap] -.-&gt; C</span><br><span class="line">        J[Secret] -.-&gt; C</span><br><span class="line">        K[HPA] -.-&gt; C</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    L[(MySQL)] --- C</span><br><span class="line">    M[(Redis)] --- C</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant Dev as 开发者</span><br><span class="line">    participant CI as CI/CD</span><br><span class="line">    participant Reg as 镜像仓库</span><br><span class="line">    participant K8s as Kubernetes</span><br><span class="line">    </span><br><span class="line">    Dev-&gt;&gt;CI: git push</span><br><span class="line">    CI-&gt;&gt;CI: go build + test</span><br><span class="line">    CI-&gt;&gt;CI: docker build</span><br><span class="line">    CI-&gt;&gt;Reg: docker push</span><br><span class="line">    CI-&gt;&gt;K8s: kubectl apply</span><br><span class="line">    K8s-&gt;&gt;K8s: RollingUpdate</span><br><span class="line">    K8s-&gt;&gt;Reg: 拉取新镜像</span><br><span class="line">    K8s-&gt;&gt;K8s: 启动新 Pod</span><br><span class="line">    K8s-&gt;&gt;K8s: 健康检查通过</span><br><span class="line">    K8s-&gt;&gt;K8s: 终止旧 Pod</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本文介绍了微服务容器化部署的完整实践：</p>
+<ul>
+<li>多阶段 Dockerfile 构建最小化镜像，非 root 用户运行</li>
+<li>Deployment 管理无状态服务，支持滚动更新零停机</li>
+<li>Service 提供内置 DNS 和服务发现，替代外部注册中心</li>
+<li>ConfigMap 管理非敏感配置，Secret 管理敏感信息</li>
+<li>HPA 根据 CPU&#x2F;内存指标自动伸缩副本数</li>
+<li>Ingress 统一管理外部流量路由</li>
+<li>优雅关闭处理 SIGTERM 信号，确保请求不丢失</li>
+</ul>
+<p>至此，微服务从入门到精通的系列文章全部完成。从架构概述到容器化部署，覆盖了微服务全生命周期的核心知识点。希望这些内容能够帮助你在实际项目中构建稳定、可扩展的微服务系统。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cxd-is-me.github.io/blog/2026/06/03/microserviceKubernetes/" data-id="cuidi-pzHU6_leQNcPqiYkR0O" data-title="微服务容器化部署：Kubernetes 实战" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/DevOps/" rel="tag">DevOps</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Docker/" rel="tag">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Kubernetes/" rel="tag">Kubernetes</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2026/06/03/microserviceSecurity/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">微服务安全：认证与授权体系</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/">Go</a><span class="category-list-count">22</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Go/Gin/">Gin</a><span class="category-list-count">22</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">10</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/">Go</a><span class="category-list-count">9</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/Go/DevOps/">DevOps</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/">架构设计</a><span class="category-list-count">1</span></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/API-%E7%BD%91%E5%85%B3/" style="font-size: 10px;">API 网关</a> <a href="/blog/tags/Consul/" style="font-size: 10px;">Consul</a> <a href="/blog/tags/DevOps/" style="font-size: 10px;">DevOps</a> <a href="/blog/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/blog/tags/Gin/" style="font-size: 16.67px;">Gin</a> <a href="/blog/tags/Go/" style="font-size: 20px;">Go</a> <a href="/blog/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/blog/tags/Jaeger/" style="font-size: 10px;">Jaeger</a> <a href="/blog/tags/Kubernetes/" style="font-size: 10px;">Kubernetes</a> <a href="/blog/tags/OAuth2/" style="font-size: 10px;">OAuth2</a> <a href="/blog/tags/OpenTelemetry/" style="font-size: 10px;">OpenTelemetry</a> <a href="/blog/tags/RESTful/" style="font-size: 10px;">RESTful</a> <a href="/blog/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/blog/tags/Web/" style="font-size: 16.67px;">Web</a> <a href="/blog/tags/gRPC/" style="font-size: 10px;">gRPC</a> <a href="/blog/tags/%E5%AE%89%E5%85%A8/" style="font-size: 10px;">安全</a> <a href="/blog/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" style="font-size: 10px;">工程化</a> <a href="/blog/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13.33px;">微服务</a> <a href="/blog/tags/%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0/" style="font-size: 10px;">服务发现</a> <a href="/blog/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" style="font-size: 10px;">架构设计</a> <a href="/blog/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" style="font-size: 10px;">消息队列</a> <a href="/blog/tags/%E7%86%94%E6%96%AD/" style="font-size: 10px;">熔断</a> <a href="/blog/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 10px;">负载均衡</a> <a href="/blog/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" style="font-size: 10px;">配置中心</a> <a href="/blog/tags/%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA/" style="font-size: 10px;">链路追踪</a> <a href="/blog/tags/%E9%99%8D%E7%BA%A7/" style="font-size: 10px;">降级</a> <a href="/blog/tags/%E9%99%90%E6%B5%81/" style="font-size: 10px;">限流</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/06/">六月 2026</a><span class="archive-list-count">32</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceKubernetes/">微服务容器化部署：Kubernetes 实战</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/microserviceSecurity/">微服务安全：认证与授权体系</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/serviceResilience/">服务容错：熔断、限流与降级</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/distributedTracing/">分布式链路追踪：OpenTelemetry 实践</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/configCenterAndMQ/">微服务配置中心与消息驱动架构</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2026/06/03/apiGateway/">API 网关设计与实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+        © 2026 Go Tech Blog. All rights reserved.
+Made with ❤️ using Hexo
+      
+      &copy; 2026 Go Developer<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">首页</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/blog/categories" class="mobile-nav-link">分类</a>
+  
+    <a href="/blog/tags" class="mobile-nav-link">标签</a>
+  
+</nav>
+    
+
+
+<script src="/blog/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/blog/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
